@@ -1,0 +1,5 @@
+# instructions once Kiali service is installed
+https://istio.io/latest/docs/tasks/observability/kiali/
+
+# check if the service is running
+kubectl -n istio-system get svc kiali

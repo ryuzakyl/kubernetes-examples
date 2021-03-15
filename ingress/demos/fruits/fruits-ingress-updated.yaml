@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fruits-ingress
+  namespace: fruits-namespace
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /apple
+          backend:
+            service:
+              name: apple-service
+              port:
+                number: 5678
+          pathType: ImplementationSpecific
+        - path: /banana
+          backend:
+            service:
+              name: banana-service
+              port:
+                number: 5678
+          pathType: ImplementationSpecific

@@ -1,0 +1,17 @@
+# exclude tmp folder from source control
+tmp
+
+# exclude any certificate related files from source control
+*.csr
+*.crt
+*.key
+
+# exclude any kubeconfig file that has been generated so far
+kubeconfig
+
+# exclude multipass file with authorized SSH keys
+multipass.yaml
+
+# exclude TODO file
+TODO
+

@@ -1,0 +1,33 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: default-backend-app
+  labels:
+    app: default-backend-app
+spec:
+  containers:
+    - name: default-backend-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=This is a service to replace the 'default-backend' service"
+      resources:
+        limits:
+          memory: 256Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: default-http-backend
+spec:
+  selector:
+    app: default-backend-app
+  ports:
+    - port: 80 # default port for backend-http-service
+      targetPort: 5678
+      protocol: TCP

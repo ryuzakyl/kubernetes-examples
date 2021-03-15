@@ -1,0 +1,33 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: apple-app
+  namespace: fruits-namespace
+  labels:
+    app: apple
+spec:
+  containers:
+    - name: apple-app
+      image: hashicorp/http-echo
+      args:
+        - "-text=apple"
+      resources:
+        limits:
+          memory: 256Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: apple-service
+  namespace: fruits-namespace
+spec:
+  selector:
+    app: apple
+  ports:
+    - port: 5678 # Default port for image

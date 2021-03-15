@@ -1,0 +1,11 @@
+# official kubernetes ingress instructions for baremetal
+https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal
+
+# considerations for bare-metal infrastructure
+https://kubernetes.github.io/ingress-nginx/deploy/baremetal/
+
+# official repo instructions for baremetal
+https://github.com/kubernetes/ingress-nginx/blob/master/deploy/static/provider/baremetal/deploy.yaml
+
+# deploy file from official ingress repository:
+https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/deploy.yaml

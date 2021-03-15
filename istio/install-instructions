@@ -1,0 +1,25 @@
+# official instructions from Istio
+https://istio.io/latest/docs/setup/getting-started/
+
+https://stackoverflow.com/questions/64373346/istioctl-install-fails-with-multiple-timeouts
+
+# this worked on a VM with 2G of RAM
+istioctl install --set profile=demo -y
+istioctl install --set profile=minimal -y
+istioctl install --set profile=experimental -y
+
+# get istio version
+istioctl version --remote
+
+# add label to default namespace to automatically inject Envoy sidecar
+# proxies when the application is deployed later.
+kubectl label namespace default istio-injection=enabled
+kubectl get namespaces --show-labels
+
+# ---------- clean up instructions --------------
+istioctl minimal uninstall --purge
+istioctl experimental uninstall --purge
+kubectl delete namespaces istio-system
+
+kubectl get pods -n istio-system
+kubectl describe <unhealthy pod> -n istio-system

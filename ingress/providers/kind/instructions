@@ -1,0 +1,6 @@
+# official repo with deploy instructions
+https://github.com/kubernetes/ingress-nginx/tree/master/deploy/static/provider/kind
+
+# official repo deploy file for kind
+https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+
