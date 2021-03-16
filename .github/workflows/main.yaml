@@ -1,20 +1,33 @@
-name: Test code and embed into README
+name: Embed code in README
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+
 jobs:
-  readme-test:
+  embed-code:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
-          persist-credentials: false
-          fetch-depth: 0
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+
       - uses: tokusumi/markdown-embed-code@main
         with:
-          markdown: "README.md, ingress/kubernetes-dashboard/README.md"
+          markdown: "README.md"
+      - uses: tokusumi/markdown-embed-code@main
+        with:
+          markdown: "ingress/kubernetes-dashboard/README.md"
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Embedding code into Markdown" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+      - uses: tokusumi/markdown-embed-code@main
