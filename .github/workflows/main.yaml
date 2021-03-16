@@ -17,4 +17,4 @@ jobs:
           fetch-depth: 0
       - uses: tokusumi/markdown-embed-code@main
         with:
-          markdown: "*.md"
+          markdown: "README.md"
