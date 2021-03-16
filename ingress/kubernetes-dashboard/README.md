@@ -1,7 +1,6 @@
 # Ingress resource to access the Kubernetes Dashboard from outside the cluster
 
-> These instructions assume the **Kubernetes Dashboard** service endpoints are listening over **HTTPS**.
->
+> These instructions assume the **Kubernetes Dashboard** service has been deployed over **HTTPS**, i.e. the service endpoints are expecting **HTTPS** connections. > The **Kubernetes Dashboard** service deployed on this repo is expecting connections over port **8443**.
 
 ## Deploy the ingress resource
 
