@@ -43,7 +43,7 @@ Address: 127.0.0.1
 
 **2. Define an ingress resource .yaml config file**
 
-sss
+```lang:LICENSE```
 
 **3. Check ingress resource is actually working**
 
