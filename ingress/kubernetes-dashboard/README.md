@@ -138,3 +138,4 @@ Once the **.csr** has been generated this way, we user the same steps to create 
 * (How to properly configure access to kubernees dashboard behind nginx ingress) https://serverfault.com/questions/1019919/how-to-properly-configure-access-to-kubernees-dashboard-behind-nginx-ingress
 * (Expose the Dashboard outside the cluster) https://stackoverflow.com/questions/39864385/how-to-access-expose-kubernetes-dashboard-service-outside-of-a-cluster
 * (How to Create a CSR and Key File for a SAN Certificate with Multiple Subject Alternate Names) https://security.stackexchange.com/questions/74345/provide-subjectaltname-to-openssl-directly-on-the-command-line, https://serverfault.com/questions/455525/openssl-how-to-generate-a-csr-with-interactively-solicited-subject-alternative, https://support.citrix.com/article/CTX227983
+* (HTTP 400 to Kubernetes Dashboard) https://serverfault.com/questions/1031810/400-error-with-nginx-ingress-to-kubernetes-dashboard
