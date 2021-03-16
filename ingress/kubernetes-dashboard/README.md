@@ -45,7 +45,15 @@ Name:	k8s-dashboard.com
 Address: 127.0.0.1
 ```
 
-**2. Define an ingress resource .yaml config file**
+**2. Generate certificates, Kubernetes Secret and the ingress resource config file**
+
+In order to configure TLS for the Ingress resource, we first need to create a certificate that will be used on the Kubernetes Secret that will be referenced on the ingress resource config file.
+
+**Generating the certificate:**
+
+**NOTE:** More detailed instructions can be found [here](https://shocksolution.com/2018/12/14/creating-kubernetes-secrets-using-tls-ssl-as-an-example/)
+
+**Creating the Kubernetes Secret:**
 
 First thing, we need to create a secret needed for HTTPS comunication with the Ingress Controller.
 
@@ -68,10 +76,20 @@ If your connection is being rejected by the **Kubernetes Dashboard** service wit
 > 2020/08/28 01:25:58 [error] 2609#2609: *795 readv() failed (104: Connection reset by peer) while reading upstream, client: 10.0.0.25, server: kube.example.com, request: "GET / HTTP/1.1", upstream: "http://10.42.0.2:8443/", host: "kube.example.com"
 >
 
-
 Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer.
 
 To fix this, we need to indicate the **Ingress controller** to
 
+### Getting SSL Certificate validation error
+
+So your Ingress Resource is not working, you check the logs of the nginx-ingress-controller pod and see the following:
+
+> Unexpected error validating SSL certificate "kubernetes-dashboard/kubernetes-dashboard-tls-secret" for server "k8s-dashboard.com": x509: certificate relies on legacy Common Name field, use SANs or temporarily enable Common Name matching with **GODEBUG=x509ignoreCN=0**
+
+For more details about this issue, check [this issue](https://github.com/kubernetes/ingress-nginx/issues/6559).
+
+From the information on the error message, one possible solution would be to add the **GODEBUG=x509ignoreCN=0** config to the **ingress-nginx-controller**. By passing an environment variable **GODEBUG** with value **x509ignoreCN=0** should do the trick.
+
 ## References:
 * https://github.com/helm/charts/issues/5007#issuecomment-425151443
+* (Some further troubleshooting) https://medium.com/@ManagedKube/kubernetes-troubleshooting-ingress-and-services-traffic-flows-547ea867b120
