@@ -17,13 +17,37 @@ For ingress resources, there are mainly two kinds of ingress rules:
 
 > Exposing the **Kubernetes Dashboard** UI over a path would result in an issue: see how to serve (or make accessible) the static assets of the web interface. For that reason, we'll go with the *Host-based* approach.
 >
-> A *.yaml* config file describing such *Path-based* approach can be consulted at: [a relative link](dashboard-ingress-path.yaml)
+> A *.yaml* config file describing such *Path-based* approach can be consulted at: [dashboard-ingress-path.yaml](dashboard-ingress-path.yaml)
 >
-> NOTE: This file has not been extensively tested. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
+> **NOTE:** This file has not been extensively tested. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
 
-1. Describe the DNS request mocking.
-2. Describe the ingress rule config and deployment
-3. Check ingress is actually working (navigate, use token target, etc.)
+The steps required to have the **Kubernetes Dashboard** UI accesible from outside the cluster, we must do the following:
+
+**1. Define the domain where it will be available**
+
+The right way to go here is to buy a domain and make it point to your cloud provided's Load Balancer (or your cluster's [MetalLB](https://metallb.universe.tf/)).
+
+Since this is a simple tutorial, we'll have to "hack" this part. We'll resort to [using an /etc/hosts file for custom domains during development](https://support.acquia.com/hc/en-us/articles/360004175973-Using-an-etc-hosts-file-for-custom-domains-during-development).
+
+Once we've made the changes described on the previous link, we check it is working:
+
+```console
+$ nslookup k8s-dashboard.com
+Server:		127.0.0.53
+Address:	127.0.0.53#53
+
+Non-authoritative answer:
+Name:	k8s-dashboard.com
+Address: 127.0.0.1
+```
+
+**2. Define an ingress resource .yaml config file**
+
+sss
+
+**3. Check ingress resource is actually working**
+
+(navigate, use token target, etc.)
 
 ## Troubleshooting
 
