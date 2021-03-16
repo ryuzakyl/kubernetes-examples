@@ -52,6 +52,8 @@ Detailed instructions about using OpenSSL to generate the certificate can be fou
 
 **Creating the Kubernetes Secret:**
 
+The TLS secret must contain keys named *certificate.crt* and *certificate.key* that contain the certificate and private key to use for TLS.
+
 In order to comunicate with the Ingress Controller via TLS, we need to create a **Kubernetes Secret**. With the **certificate** and **key** created, we create the secret with:
 
 ```console
@@ -70,7 +72,11 @@ It should show the Kubernetes Dashboard UI interface:
 
 ![Kubernetes Dashboard UI](assets/images/kubernetes-dashboard.png)
 
-(navigate, use token target, etc.)
+To enter it, you can either use the kubeconfig file or the authorization token. To get the token, you can user the following make target:
+
+> ```console
+> $ make get-dashboard-login-token
+> ```
 
 ## Troubleshooting
 
@@ -78,21 +84,30 @@ It should show the Kubernetes Dashboard UI interface:
 
 The reason is the client is initiating an HTTP connection, but the end service is listening over HTTPS.
 
-In this case, add TLS to the Ingress config. talk about annotations here.
+Two possibilities might be the root cause:
+1. The client is not connecting via HTTPS and is simply typing **http://** on the browser. Unlikely because modern browsers automatically switch to **https://**.
+2. The Ingress Controller is trying to connect to the service via HTTP.
 
-https://stackoverflow.com/questions/48324760/ingress-configuration-for-dashboard
+For this last case we have to make sure that our config file is including the TLS configuration for that host. You can secure an Ingress by specifying a Secret that contains a TLS private key and certificate ([read more](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)).
 
+![Dashboard Ingress TLS Config](assets/images/ingress-config.png)
 
 ### Getting error: HTTP 400 "Connection reset by peer"
 
 If your connection is being rejected by the **Kubernetes Dashboard** service with a message similar to this one:
 
 > 2020/08/28 01:25:58 [error] 2609#2609: *795 readv() failed (104: Connection reset by peer) while reading upstream, client: 10.0.0.25, server: kube.example.com, request: "GET / HTTP/1.1", upstream: "http://10.42.0.2:8443/", host: "kube.example.com"
->
 
 Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer.
 
-To fix this, we need to indicate the **Ingress controller** to
+From the docs:
+> The Ingress resource only supports a single TLS port, 443, and assumes TLS termination at the ingress point (traffic to the Service and its Pods is in plaintext).
+
+Indeed, NGINX is proxying the HTTP request to "http://10.42.0.2:8443/", which is an HTTPS endpoint, using HTTP as protocol ([read more](https://stackoverflow.com/questions/48324760/ingress-configuration-for-dashboard)).
+
+To fix this, we need to indicate the **Ingress Controller** to forward the request to the pods with HTTPS. For that we need the following annotation: **nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"** ([read more](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#backend-protocol)).
+
+![Annotation for HTTPS forwarding](assets/images/annotation-https.png)
 
 ### Getting SSL Certificate validation error
 
