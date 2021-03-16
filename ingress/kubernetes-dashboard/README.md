@@ -49,34 +49,6 @@ Address: 127.0.0.1
 
 First thing, we need to create a secret needed for HTTPS comunication with the Ingress Controller.
 
-```:ingress/kubernetes-dashboard/dashboard-ingress-host.yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: kubernetes-dashboard-ingress
-  namespace: kubernetes-dashboard
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-spec:
-  rules:
-    - host: k8s-dashboard.com
-      http:
-        paths:
-        - pathType: Prefix
-          path: /
-          backend:
-            service:
-              name: kubernetes-dashboard
-              port:
-                number: 443
-  tls:
-  - secretName: kubernetes-dashboard-tls-secret
-    hosts:
-      - k8s-dashboard.com
-
-```
-
 **3. Check ingress resource is actually working**
 
 (navigate, use token target, etc.)
