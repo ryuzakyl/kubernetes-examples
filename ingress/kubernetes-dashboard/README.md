@@ -98,7 +98,7 @@ If your connection is being rejected by the **Kubernetes Dashboard** service wit
 
 > 2020/08/28 01:25:58 [error] 2609#2609: *795 readv() failed (104: Connection reset by peer) while reading upstream, client: 10.0.0.25, server: kube.example.com, request: "GET / HTTP/1.1", upstream: "http://10.42.0.2:8443/", host: "kube.example.com"
 
-Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer.
+Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer ([read more](https://github.com/helm/charts/issues/5007#issuecomment-425151443)).
 
 From the docs:
 > The Ingress resource only supports a single TLS port, 443, and assumes TLS termination at the ingress point (traffic to the Service and its Pods is in plaintext).
@@ -133,7 +133,6 @@ The [new instructions](https://www.ssls.com/knowledgebase/how-to-fill-in-the-san
 Once the **.csr** has been generated this way, we user the same steps to create the **Kubernetes Secret** and deploy the **Ingress Resource**.
 
 ## Other References:
-* https://github.com/helm/charts/issues/5007#issuecomment-425151443
 * (Some further troubleshooting) https://medium.com/@ManagedKube/kubernetes-troubleshooting-ingress-and-services-traffic-flows-547ea867b120
 * (How to properly configure access to kubernees dashboard behind nginx ingress) https://serverfault.com/questions/1019919/how-to-properly-configure-access-to-kubernees-dashboard-behind-nginx-ingress
 * (Expose the Dashboard outside the cluster) https://stackoverflow.com/questions/39864385/how-to-access-expose-kubernetes-dashboard-service-outside-of-a-cluster
