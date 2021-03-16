@@ -1,7 +1,8 @@
 # Ingress resource to access the Kubernetes Dashboard from outside the cluster
 
 > These instructions assume the **Kubernetes Dashboard** service has been deployed over **HTTPS**, i.e. the service endpoints are expecting **HTTPS** connections.
-> The **Kubernetes Dashboard** service deployed on this repo is expecting connections over port **8443**.
+The **Kubernetes Dashboard** service deployed on this repo is expecting connections over port **8443**.
+
 
 ## Deploy the ingress resource
 
@@ -10,6 +11,7 @@
 > $ make <target-to-be-added-here>
 > ```
 >
+
 
 For ingress resources, there are mainly two kinds of ingress rules:
 * Host-based
@@ -20,6 +22,7 @@ For ingress resources, there are mainly two kinds of ingress rules:
 > A *.yaml* config file describing such *Path-based* approach can be consulted at: [dashboard-ingress-path.yaml](dashboard-ingress-path.yaml)
 >
 > **NOTE:** This file has not been extensively tested. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
+
 
 The steps required to have the **Kubernetes Dashboard** UI accesible from outside the cluster, we must do the following:
 
@@ -64,10 +67,10 @@ If your connection is being rejected by the **Kubernetes Dashboard** service wit
 > 2020/08/28 01:25:58 [error] 2609#2609: *795 readv() failed (104: Connection reset by peer) while reading upstream, client: 10.0.0.25, server: kube.example.com, request: "GET / HTTP/1.1", upstream: "http://10.42.0.2:8443/", host: "kube.example.com"
 >
 
+
 Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer.
 
 To fix this, we need to indicate the **Ingress controller** to
 
 ## References:
 * https://github.com/helm/charts/issues/5007#issuecomment-425151443
-*
