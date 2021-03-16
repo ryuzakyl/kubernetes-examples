@@ -48,13 +48,27 @@ In order to configure TLS for the Ingress Resource, we first need to create a ce
 
 **Generating the certificate:**
 
-**NOTE:** More detailed instructions can be found [here](https://shocksolution.com/2018/12/14/creating-kubernetes-secrets-using-tls-ssl-as-an-example/)
+Detailed instructions about using OpenSSL to generate the certificate can be found [here](https://shocksolution.com/2018/12/14/creating-kubernetes-secrets-using-tls-ssl-as-an-example/). Check the troubleshooting section to avoid running into certificate-related issues.
 
 **Creating the Kubernetes Secret:**
 
-First thing, we need to create a secret needed for HTTPS comunication with the Ingress Controller.
+In order to comunicate with the Ingress Controller via TLS, we need to create a **Kubernetes Secret**. With the **certificate** and **key** created, we create the secret with:
+
+```console
+$ kubectl create secret tls kubernetes-dashboard-tls-secret --key="certificate.key" --cert="certificate.crt"
+```
 
 **3. Deploy the Ingress Resource and verify it is actually working properly**
+
+The Host-based Ingress Resource .yaml [config file](dashboard-ingress-host.yaml) can be applied like follows:
+
+```console
+$ kubectl apply -f ingress/kubernetes-dashboard/dashboard-ingress-host.yaml
+```
+
+It should show the Kubernetes Dashboard UI interface:
+
+![Kubernetes Dashboard UI](assets/images/kubernetes-dashboard.png)
 
 (navigate, use token target, etc.)
 
@@ -97,13 +111,13 @@ If you don't want to change/edit an already deployed **ingress-nginx-controller*
 > $ make generate-dashboard-certificate
 > ```
 
-Initially [these](https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md) are the instructions used to generate the certificate needed on the Kubernetes Secret.
+Initially [these](https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md) are the instructions used to generate the certificate needed on the **Kubernetes Secret**.
 
 The [new instructions](https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/) to generate the certificate mainly differ on the way the *Certificate Signing Request* (*.csr file) is generated.
 
 Once the **.csr** has been generated this way, we user the same steps to create the **Kubernetes Secret** and deploy the **Ingress Resource**.
 
-## References:
+## Other References:
 * https://github.com/helm/charts/issues/5007#issuecomment-425151443
 * (Some further troubleshooting) https://medium.com/@ManagedKube/kubernetes-troubleshooting-ingress-and-services-traffic-flows-547ea867b120
 * (How to properly configure access to kubernees dashboard behind nginx ingress) https://serverfault.com/questions/1019919/how-to-properly-configure-access-to-kubernees-dashboard-behind-nginx-ingress
