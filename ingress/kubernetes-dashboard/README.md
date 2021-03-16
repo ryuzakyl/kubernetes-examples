@@ -10,7 +10,7 @@ The **Kubernetes Dashboard** service deployed on this repo is expecting connecti
 > ```console
 > $ make <target-to-be-added-here>
 > ```
->
+> 
 
 
 For ingress resources, there are mainly two kinds of ingress rules:
@@ -18,9 +18,9 @@ For ingress resources, there are mainly two kinds of ingress rules:
 * Path-based
 
 > Exposing the **Kubernetes Dashboard** UI over a path would result in an issue: see how to serve (or make accessible) the static assets of the web interface. For that reason, we'll go with the *Host-based* approach.
->
+> 
 > A *.yaml* config file describing such *Path-based* approach can be consulted at: [dashboard-ingress-path.yaml](dashboard-ingress-path.yaml)
->
+> 
 > **NOTE:** This file has not been extensively tested. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
 
 
@@ -47,6 +47,31 @@ Address: 127.0.0.1
 **2. Define an ingress resource .yaml config file**
 
 ```:ingress/kubernetes-dashboard/dashboard-ingress-host.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  rules:
+    - host: k8s-dashboard.com
+      http:
+        paths:
+        - pathType: Prefix
+          path: /
+          backend:
+            service:
+              name: kubernetes-dashboard
+              port:
+                number: 443
+  tls:
+  - secretName: kubernetes-dashboard-tls-secret
+    hosts:
+      - k8s-dashboard.com
+
 ```
 
 **3. Check ingress resource is actually working**
@@ -66,7 +91,7 @@ In this case, add TLS to the Ingress config. talk about annotations here.
 If your connection is being rejected by the **Kubernetes Dashboard** service with a message similar to this one:
 
 > 2020/08/28 01:25:58 [error] 2609#2609: *795 readv() failed (104: Connection reset by peer) while reading upstream, client: 10.0.0.25, server: kube.example.com, request: "GET / HTTP/1.1", upstream: "http://10.42.0.2:8443/", host: "kube.example.com"
->
+> 
 
 
 Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer.
