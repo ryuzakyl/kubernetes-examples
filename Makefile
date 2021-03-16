@@ -141,6 +141,12 @@ get-dashboard-login-token:
 	@echo "Token to access the Kubernetes Dashboard:";
 	@echo $(TOKEN)
 
+generate-dashboard-certificate:
+	@echo "WIP"
+
+deploy-dashboard-ingress:
+	@echo "WIP: uses generate-dashboard-certificate and generate secret"
+
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
 # https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/
 
@@ -154,5 +160,6 @@ get-dashboard-login-token:
 
 
 # create secret imperative
+# kubectl create secret tls test-tls --key="tls.key" --cert="tls.crt"
 # https://shocksolution.com/2018/12/14/creating-kubernetes-secrets-using-tls-ssl-as-an-example/
 # kubectl create secret tls kubernetes-dashboard-tls-secret --namespace="kubernetes-dashboard" --key="dashboard.key" --cert="dashboard.crt"

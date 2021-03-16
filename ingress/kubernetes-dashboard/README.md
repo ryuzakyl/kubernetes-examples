@@ -1,26 +1,23 @@
-# Ingress resource to access the Kubernetes Dashboard from outside the cluster
+# Ingress Resource to access the Kubernetes Dashboard from outside the cluster
 
 > These instructions assume the **Kubernetes Dashboard** service has been deployed over **HTTPS**, i.e. the service endpoints are expecting **HTTPS** connections.
 The **Kubernetes Dashboard** service deployed on this repo is expecting connections over port **8443**.
 
-
-## Deploy the ingress resource
+## Deploy the Ingress Resource
 
 > **TL;DR** Check the following make target:
 > ```console
-> $ make <target-to-be-added-here>
+> $ make deploy-dashboard-ingress
 > ```
-> 
 
-
-For ingress resources, there are mainly two kinds of ingress rules:
+For Ingress Resources, there are mainly two kinds of ingress rules:
 * Host-based
 * Path-based
 
 > Exposing the **Kubernetes Dashboard** UI over a path would result in an issue: see how to serve (or make accessible) the static assets of the web interface. For that reason, we'll go with the *Host-based* approach.
-> 
+>
 > A *.yaml* config file describing such *Path-based* approach can be consulted at: [dashboard-ingress-path.yaml](dashboard-ingress-path.yaml)
-> 
+>
 > **NOTE:** This file has not been extensively tested. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
 
 
@@ -45,9 +42,9 @@ Name:	k8s-dashboard.com
 Address: 127.0.0.1
 ```
 
-**2. Generate certificates, Kubernetes Secret and the ingress resource config file**
+**2. Generate certificates, Kubernetes Secret and the Ingress Resource config file**
 
-In order to configure TLS for the Ingress resource, we first need to create a certificate that will be used on the Kubernetes Secret that will be referenced on the ingress resource config file.
+In order to configure TLS for the Ingress Resource, we first need to create a certificate that will be used on the Kubernetes Secret that will be referenced on the Ingress Resource config file.
 
 **Generating the certificate:**
 
@@ -57,7 +54,7 @@ In order to configure TLS for the Ingress resource, we first need to create a ce
 
 First thing, we need to create a secret needed for HTTPS comunication with the Ingress Controller.
 
-**3. Check ingress resource is actually working**
+**3. Deploy the Ingress Resource and verify it is actually working properly**
 
 (navigate, use token target, etc.)
 
@@ -69,12 +66,15 @@ The reason is the client is initiating an HTTP connection, but the end service i
 
 In this case, add TLS to the Ingress config. talk about annotations here.
 
+https://stackoverflow.com/questions/48324760/ingress-configuration-for-dashboard
+
+
 ### Getting error: HTTP 400 "Connection reset by peer"
 
 If your connection is being rejected by the **Kubernetes Dashboard** service with a message similar to this one:
 
 > 2020/08/28 01:25:58 [error] 2609#2609: *795 readv() failed (104: Connection reset by peer) while reading upstream, client: 10.0.0.25, server: kube.example.com, request: "GET / HTTP/1.1", upstream: "http://10.42.0.2:8443/", host: "kube.example.com"
-> 
+>
 
 Notice the protocol part of the destination URL trying to be reached: **http://**. This indicates the **Ingress controller** is trying to reach the service via **HTTP** and therefore, the connection is being reset by peer.
 
@@ -90,6 +90,22 @@ For more details about this issue, check [this issue](https://github.com/kuberne
 
 From the information on the error message, one possible solution would be to add the **GODEBUG=x509ignoreCN=0** config to the **ingress-nginx-controller**. By passing an environment variable **GODEBUG** with value **x509ignoreCN=0** should do the trick.
 
+If you don't want to change/edit an already deployed **ingress-nginx-controller**, the solution is to re-generate the certificate and re-deploy (or update) the Ingress Resource.
+
+> **TL;DR** Check the following make target:
+> ```console
+> $ make generate-dashboard-certificate
+> ```
+
+Initially [these](https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md) are the instructions used to generate the certificate needed on the Kubernetes Secret.
+
+The [new instructions](https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/) to generate the certificate mainly differ on the way the *Certificate Signing Request* (*.csr file) is generated.
+
+Once the **.csr** has been generated this way, we user the same steps to create the **Kubernetes Secret** and deploy the **Ingress Resource**.
+
 ## References:
 * https://github.com/helm/charts/issues/5007#issuecomment-425151443
 * (Some further troubleshooting) https://medium.com/@ManagedKube/kubernetes-troubleshooting-ingress-and-services-traffic-flows-547ea867b120
+* (How to properly configure access to kubernees dashboard behind nginx ingress) https://serverfault.com/questions/1019919/how-to-properly-configure-access-to-kubernees-dashboard-behind-nginx-ingress
+* (Expose the Dashboard outside the cluster) https://stackoverflow.com/questions/39864385/how-to-access-expose-kubernetes-dashboard-service-outside-of-a-cluster
+* (How to Create a CSR and Key File for a SAN Certificate with Multiple Subject Alternate Names) https://security.stackexchange.com/questions/74345/provide-subjectaltname-to-openssl-directly-on-the-command-line, https://serverfault.com/questions/455525/openssl-how-to-generate-a-csr-with-interactively-solicited-subject-alternative, https://support.citrix.com/article/CTX227983
