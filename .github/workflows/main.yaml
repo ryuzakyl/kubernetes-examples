@@ -17,4 +17,4 @@ jobs:
           fetch-depth: 0
       - uses: tokusumi/markdown-embed-code@main
         with:
-          markdown: "README.md"
+          markdown: "README.md, ingress/kubernetes-dashboard/README.md"
