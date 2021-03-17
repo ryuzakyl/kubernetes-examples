@@ -4,20 +4,18 @@ metadata:
   name: kubernetes-dashboard-ingress
   namespace: kubernetes-dashboard
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/kubernetes-dashboard)$ $1/ redirect;
 spec:
   rules:
     - http:
         paths:
         - pathType: Prefix
-          path: /kubernetes-dashboard
+          path: /kubernetes-dashboard(/|$)(.*)
           backend:
             service:
               name: kubernetes-dashboard
               port:
                 number: 443
-  tls:
-  - secretName: kubernetes-dashboard-tls-secret
-    hosts:
-      - k8s-dashboard.com
