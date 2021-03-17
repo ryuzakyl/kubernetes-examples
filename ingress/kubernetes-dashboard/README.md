@@ -22,6 +22,7 @@ For Ingress Resources, there are mainly two kinds of ingress rules:
 > Exposing the **Kubernetes Dashboard** UI wihtout much thought over a path might result in an issue: see how to serve (or make accessible) the static assets of the web interface. We'll go into it in this section.
 
 The *.yaml* config file for this Ingress Resource is the following:
+
 ![Dashboard Ingress Path based](assets/images/ingress-path.png)
 
 Note on the previous image the **nginx.ingress.kubernetes.io/rewrite-target** annotation, which rewrites the URL before forwarding the request to the backend pods. In <b>/kubernetes-dashboard(/|$)(.*)</b> for path, <b>(.*)</b> stores the dynamic URL that's generated while accessing the Kubernetes Dashboard.
