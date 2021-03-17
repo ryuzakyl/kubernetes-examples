@@ -46,6 +46,7 @@ Address: 127.0.0.1
 
 > :information_source::bell: **IMPORTANT!!** This step is **OPTIONAL** and in case we don't do it, the Ingress itself will provide a certificate for us:
 > ![Kubernetes Dashboard UI](assets/images/ingress-certificate.png)
+>
 > In case we do it, we would see the following certificate when accessing *k8s-dashboard.com*:
 > ![Kubernetes Dashboard UI](assets/images/my-certificate.png)
 
