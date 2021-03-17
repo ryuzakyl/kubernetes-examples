@@ -31,6 +31,10 @@ Check [here](https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/#
 
 Check [here](https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/#view-your-clusters-audit-logs) and [here](https://www.datadoghq.com/blog/monitor-kubernetes-audit-logs/).
 
+## Application Performance Monitoring (APM)
+
+Check [this](https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/#enable-apm-in-your-kubernetes-cluster).
+
 # References:
 * https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics/
 * https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/
