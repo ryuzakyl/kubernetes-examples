@@ -1,25 +1,42 @@
 # Ingress Resource to access the Kubernetes Dashboard from outside the cluster
 
+> **NOTE:** These instructions are far from being an official guide or a very detailed step by step tutorial. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
+> However, I hope this would help many and save them some time.
+
 > These instructions assume the **Kubernetes Dashboard** service has been deployed over **HTTPS**, i.e. the service endpoints are expecting **HTTPS** connections.
 The **Kubernetes Dashboard** service deployed on this repo is expecting connections over port **8443**.
 
 ## Deploy the Ingress Resource
 
-> **TL;DR** Check the following make target:
-> ```console
-> $ make deploy-dashboard-ingress
-> ```
-
 For Ingress Resources, there are mainly two kinds of ingress rules:
 * Host-based
 * Path-based
 
-> Exposing the **Kubernetes Dashboard** UI over a path would result in an issue: see how to serve (or make accessible) the static assets of the web interface. For that reason, we'll go with the *Host-based* approach.
->
-> A *.yaml* config file describing such *Path-based* approach can be consulted at: [dashboard-ingress-path.yaml](dashboard-ingress-path.yaml)
->
-> **NOTE:** This file has not been extensively tested. So... *reader discretion is advised*, :stuck_out_tongue_winking_eye:.
+**Path-based:**
 
+> **TL;DR** Check the following make target:
+> ```console
+> $ make deploy-dashboard-path-ingress
+> ```
+
+> Exposing the **Kubernetes Dashboard** UI wihtout much thought over a path might result in an issue: see how to serve (or make accessible) the static assets of the web interface. We'll go into it in this section.
+
+The *.yaml* config file for this Ingress Resource is the following:
+![Dashboard Ingress Path based](assets/images/ingress-path.png)
+
+Note on the previous image the **nginx.ingress.kubernetes.io/rewrite-target** annotation, which rewrites the URL before forwarding the request to the backend pods. In <b>/kubernetes-dashboard(/|$)(.*)</b> for path, <b>(.*)</b> stores the dynamic URL that's generated while accessing the Kubernetes Dashboard.
+
+The **nginx.ingress.kubernetes.io/rewrite-target** annotation replaces the captured data in the URL before forwarding the request to the kubernetes-dashboard service. The **nginx.ingress.kubernetes.io/configuration-snippet** annotation rewrites the URL to add a trailing slash ("/") only if **/kubernetes-dashboard** is accessed.
+
+**NOTE:** More detailed explanations can be found
+[here](https://aws.amazon.com/es/premiumsupport/knowledge-center/eks-kubernetes-dashboard-custom-path/) and [here](https://www.mdeditor.tw/pl/pzWO/zh-tw) (this one must be translated to English).
+
+**Host-based:**
+
+> **TL;DR** Check the following make target:
+> ```console
+> $ make deploy-dashboard-host-ingress
+> ```
 
 The steps required to have the **Kubernetes Dashboard** UI accesible from outside the cluster, we must do the following:
 

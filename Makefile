@@ -144,7 +144,10 @@ get-dashboard-login-token:
 generate-dashboard-certificate:
 	@echo "WIP"
 
-deploy-dashboard-ingress:
+deploy-dashboard-path-ingress:
+	@echo "WIP: uses generate-dashboard-certificate and generate secret"
+
+deploy-dashboard-host-ingress:
 	@echo "WIP: uses generate-dashboard-certificate and generate secret"
 
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
