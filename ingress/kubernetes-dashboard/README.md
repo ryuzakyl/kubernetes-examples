@@ -44,6 +44,11 @@ Address: 127.0.0.1
 
 **2. Generate certificates, Kubernetes Secret and the Ingress Resource config file**
 
+> :information_source::bell: **IMPORTANT!!** This step is **OPTIONAL** and in case we don't do it, the Ingress itself will provide a certificate for us:
+> ![Kubernetes Dashboard UI](assets/images/ingress-certificate.png)
+> In case we do it, we would see the following certificate when accessing *k8s-dashboard.com*:
+> ![Kubernetes Dashboard UI](assets/images/my-certificate.png)
+
 In order to configure TLS for the Ingress Resource, we first need to create a certificate that will be used on the Kubernetes Secret that will be referenced on the Ingress Resource config file.
 
 **Generating the certificate:**

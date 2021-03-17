@@ -18,7 +18,7 @@ spec:
               name: kubernetes-dashboard
               port:
                 number: 443
-  tls:
-  - secretName: kubernetes-dashboard-tls-secret
-    hosts:
-      - k8s-dashboard.com
+  # tls:
+  # - secretName: kubernetes-dashboard-tls-secret
+  #   hosts:
+  #     - k8s-dashboard.com
