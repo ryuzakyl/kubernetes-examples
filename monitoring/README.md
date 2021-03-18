@@ -29,7 +29,7 @@ Again, from the [repo](https://github.com/kubernetes-sigs/metrics-server):
 
 **NOTE:** For unsupported use cases, check out full monitoring solutions like [Prometheus](https://prometheus.io/) (or the [Section](#prometheus-section) on these examples).
 
-Check [here](https://github.com/kubernetes-sigs/metrics-server) or [here](https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics/).
+To know how to deploy it and work with it, please check the [metrics-server documentation](metrics-server/README.md) on these examples.
 
 # kube-state-metrics
 
