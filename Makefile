@@ -89,6 +89,12 @@ run:
 version:
 	@echo $(TAG)
 
+kind-install:
+	@curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0
+	@chmod +x ./kind
+	@mv ./kind /usr/bin/kind
+
+
 create-cluster:
 ifndef name
 	@echo A cluster 'name' must be provided

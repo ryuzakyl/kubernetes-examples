@@ -21,7 +21,7 @@ The changes would be the following:
 
 Once it's re-applied, we can make use of commands like **kubectl top nodes** and **kubectl top pods** that depend on the *metrics-server* being properly deployed:
 
-![kubectl top working](assets/images/metrics-server-working.png).
+![kubectl top working](assets/images/metrics-server-working.png)
 
 ### Configuration
 
@@ -60,3 +60,4 @@ The error is due to the self-signed TLS certificate. To solve it, we need to add
 * https://www.sysspace.net/post/kubernetes-cluster-and-pod-resource-monitoring
 * https://github.com/kubernetes-sigs/metrics-server/issues/196
 * https://stackoverflow.com/questions/64767239/kubernetes-metrics-server-not-running
+* https://github.com/kubernetes-sigs/metrics-server/issues/131
