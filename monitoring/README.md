@@ -6,7 +6,7 @@
 
 # metrics-server
 
-## What is the *metrics-server*?
+### What?
 
 From the official GitHub [repository](https://github.com/kubernetes-sigs/metrics-server):
 
@@ -14,7 +14,7 @@ From the official GitHub [repository](https://github.com/kubernetes-sigs/metrics
 >
 > Metrics Server is not meant for non-autoscaling purposes. For example, don't use it to forward metrics to monitoring solutions, or as a source of monitoring solution metrics.
 
-## Why the *metrics-server*?
+### Why?
 
 Again, from the [repo](https://github.com/kubernetes-sigs/metrics-server):
 
