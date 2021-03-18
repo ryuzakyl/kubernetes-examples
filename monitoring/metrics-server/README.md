@@ -1,0 +1,6 @@
+# How to Deploy
+
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+# Other References:
+* https://www.sysspace.net/post/kubernetes-cluster-and-pod-resource-monitoring

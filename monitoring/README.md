@@ -6,6 +6,29 @@
 
 # metrics-server
 
+## What is the *metrics-server*?
+
+From the official GitHub [repository](https://github.com/kubernetes-sigs/metrics-server):
+
+> Metrics Server is a scalable, efficient source of container resource metrics for Kubernetes built-in autoscaling pipelines.
+>
+> Metrics Server is not meant for non-autoscaling purposes. For example, don't use it to forward metrics to monitoring solutions, or as a source of monitoring solution metrics.
+
+## Why the *metrics-server*?
+
+Again, from the [repo](https://github.com/kubernetes-sigs/metrics-server):
+
+> You can use Metrics Server for:
+> * CPU/Memory based horizontal autoscaling (learn more about Horizontal Pod Autoscaler)
+> * Automatically adjusting/suggesting resources needed by containers (learn more about Vertical Pod Autoscaler)
+>
+> Don't use Metrics Server when you need:
+> * Non-Kubernetes clusters
+> * An accurate source of resource usage metrics
+> * Horizontal autoscaling based on other resources than CPU/Memory
+
+**NOTE:** For unsupported use cases, check out full monitoring solutions like [Prometheus](https://prometheus.io/) (or the [Section](#prometheus-section) on these examples).
+
 Check [here](https://github.com/kubernetes-sigs/metrics-server) or [here](https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics/).
 
 # kube-state-metrics
@@ -15,6 +38,7 @@ Check [here](https://github.com/kubernetes-sigs/metrics-server) or [here](https:
 * https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics/#add-kube-state-metrics-to-your-cluster
 
 # Prometheus
+<a name="prometheus-section"></a>
 
 * https://sysdig.com/blog/kubernetes-monitoring-prometheus/
 
