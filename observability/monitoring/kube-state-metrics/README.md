@@ -1,5 +1,18 @@
 # How to install?
 
+<script src="https://gist.github.com/ryuzakyl/569b3b993d836344aaecdd21f6f22c7d.js"></script>
+
+From the official [kube-state-metrics](https://github.com/kubernetes/kube-state-metrics) repository:
+> To deploy this project, you can simply run `kubectl apply -f examples/standard` and a Kubernetes service and deployment will be created.
+
+Therefore, the instructions would be the following:
+```console
+$ git clone https://github.com/kubernetes/kube-state-metrics.git
+$ cd kube-state-metrics
+$ kubectl apply -f examples/standard
+```
+
+Once it is deployed, we can a
 
 * https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics/#add-kube-state-metrics-to-your-cluster
 

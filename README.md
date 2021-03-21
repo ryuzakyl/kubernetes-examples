@@ -77,10 +77,26 @@ From the Quick Start [guide](https://kind.sigs.k8s.io/docs/user/quick-start/#int
 > $ export KUBECONFIG=/path/to/folder/with/kubeconfig
 > ```
 
-## Monitoring
+## Observability
+
+### Monitoring/Metrics
 
 As the number of cyber attacks rise, it’s important for cloud monitoring services to detect possible breaches, identify security gaps, and secure the network well before an attack happens.
 
 For more details about Cloud Monitoring, please check [this](https://www.nutanix.com/info/cloud-monitoring).
 
-For the examples tried on this project, please check [here](monitoring/README.md).
+For the examples tried on this project, please check [here](observability/monitoring/README.md).
+
+### Tracing
+
+* Jaeger
+* Zipkin
+* OpenCensus
+* Cilium, Hubble
+* OpenTracing
+
+### Logging
+
+* https://thenewstack.io/logging-for-kubernetes-what-to-log-and-how-to-log-it/
+* (logging with Fluentd) https://medium.com/hashmapinc/application-logging-simplified-in-kubernetes-part-1-5ba603a1744b
+* (section Kubernetes logging tools) https://logz.io/blog/a-practical-guide-to-kubernetes-logging/
