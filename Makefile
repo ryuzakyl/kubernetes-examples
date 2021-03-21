@@ -117,6 +117,33 @@ else
 	@kind delete cluster --name $(name)
 endif
 
+restart-cluster:
+ifndef name
+	@echo "A cluster 'name' must be provided"
+	@echo Usage:
+	@echo 	"\tmake restart-cluster name=<cluster-name>";
+else
+	@echo Restarting cluster named $(name)...
+	# @kind get nodes --name $(name)
+
+	$(eval KIND_CONTAINERS := $(shell kind get nodes --name $(name) | `sed 's/$/,/'`))
+	@echo KIND_CONTAINERS;
+
+	for container in "${KIND_CONTAINERS[@]}"; do
+		echo "Stopping node '$container'";
+		# docker container stop $container
+	done
+
+	echo "";
+	echo "-------------------------------------------------------";
+	echo "";
+
+	for container in "${KIND_CONTAINERS[@]}"; do
+		echo "Starting node '$container'";
+		# docker start $container && docker exec $container sh -c 'mount -o remount,ro /sys; kill -USR1 1'
+	done
+endif
+
 deploy-nginx-ingress-controller:
 	@echo "Deploying NGINX Ingress for KinD..."
 	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
@@ -155,6 +182,22 @@ deploy-dashboard-path-ingress:
 
 deploy-dashboard-host-ingress:
 	@echo "WIP: uses generate-dashboard-certificate and generate secret"
+
+deploy-kube-state-metrics:
+	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/service-account.yaml
+	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/cluster-role.yaml
+	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/cluster-role-binding.yaml
+	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/service.yaml
+	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/deployment.yaml
+
+uninstall-kube-state-metrics:
+	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/service-account.yaml
+	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/cluster-role.yaml
+	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/cluster-role-binding.yaml
+	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/service.yaml
+	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/deployment.yaml
+
+
 
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
 # https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/

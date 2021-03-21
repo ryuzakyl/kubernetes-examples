@@ -57,7 +57,10 @@ The error is due to the self-signed TLS certificate. To solve it, we need to add
 >  The previous fix this SHOULD NOT be used in a *"production"* cluster, i.e. exposed to end users. This fix makes sense for playing around with clusters, or for internal clusters, but always be aware when using this on the real world.
 
 # Other References:
+* https://www.youtube.com/watch?v=PEs2ccoZ3ow
 * https://www.sysspace.net/post/kubernetes-cluster-and-pod-resource-monitoring
+. https://computingforgeeks.com/how-to-deploy-metrics-server-to-kubernetes-cluster/
 * https://github.com/kubernetes-sigs/metrics-server/issues/196
 * https://stackoverflow.com/questions/64767239/kubernetes-metrics-server-not-running
+* https://medium.com/@cagri.ersen/kubernetes-metrics-server-installation-d93380de008
 * https://github.com/kubernetes-sigs/metrics-server/issues/131
