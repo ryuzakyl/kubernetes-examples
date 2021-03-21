@@ -37,7 +37,7 @@ The text-based metrics can be viewed at http://localhost:8001/api/v1/namespaces/
 
 ## 2. With an Ingress Rule
 
-With the following `.yaml` config file, we can expose the `kube-state-metrics` service from outside the cluster:
+With the following `.yaml` [config file](../../../ingress/kube-state-metrics/kube-state-metrics-ingress.yaml), we can expose the `kube-state-metrics` service from outside the cluster:
 
 ![yaml-config-file.png](assets/images/yaml-config-file.png)
 

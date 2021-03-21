@@ -64,7 +64,7 @@ The `metrics-server` is a project that has been inspired by Heapster and is impl
 >
 > The `kube-state-metrics` is an exporter that allows **Prometheus** to scrape that information as well.
 
-For installation instruction and more details check [here](kube-state-metrics/README.md).
+For installation instructions and more details check [here](kube-state-metrics/README.md).
 
 # Prometheus
 <a name="prometheus-section"></a>
