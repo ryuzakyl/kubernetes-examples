@@ -47,13 +47,9 @@ The `kube-state-metrics` home page is available at the specified location:
 The actual metrics (as seen with the proxy approach) can be found on the `/metrics` endpoint:
 ![kube-state-metrics-ingress.png](assets/images/kube-state-metrics-ingress.png)
 
-# `kube-state-metrics` on Sysdig Monitor
-
-https://sysdig.com/blog/introducing-kube-state-metrics/
-
-# `kube-state-metrics` on Grafana
-
-https://grafana.com/grafana/dashboards/13332
-
 # Other References:
 * https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics
+* https://sysdig.com/blog/introducing-kube-state-metrics/
+* https://grafana.com/grafana/dashboards/13332
+* https://medium.com/faun/introduction-to-kube-state-metrics-in-kubernetes-1b1e243618a1
+* https://www.digitalocean.com/docs/kubernetes/how-to/monitor-advanced/

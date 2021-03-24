@@ -15,6 +15,10 @@ we can use the following [tutorial](https://www.datadoghq.com/blog/monitoring-ku
 
 # The Datadog Agent
 
+* https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/
+* https://docs.datadoghq.com/agent/kubernetes/?tab=operator
+* https://docs.datadoghq.com/agent/kubernetes/prometheus/
+
 # The Datadog Cluster Agent
 
 # The node-based Agent
