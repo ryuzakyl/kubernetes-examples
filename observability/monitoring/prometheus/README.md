@@ -3,6 +3,18 @@ General description about Prometheus.
 
 # Install
 
+manifests are in folder:
+https://github.com/prometheus-operator/kube-prometheus/tree/main/manifests
+
+locally we can find them on `observability/monitoring/prometheus/manifests`.
+
+the commands are the following:
+```console
+# Update the namespace and CRDs, and then wait for them to be available before creating the remaining resources
+$ kubectl apply -f manifests/setup
+$ kubectl apply -f manifests/
+```
+
 https://github.com/prometheus-operator/kube-prometheus#apply-the-kube-prometheus-stack
 
 https://www.youtube.com/watch?v=QoDqxm7ybLc
@@ -28,6 +40,8 @@ https://prometheus.io/docs/concepts/metric_types/
 3. Histogram (https://prometheus.io/docs/practices/histograms/, https://www.robustperception.io/how-does-a-prometheus-histogram-work)
 
 ## Prometheus metrics compatibility
+
+Talk about OpenMetrics: https://www.robustperception.io/openmetrics-is-released
 
 [Software exposing Prometheus metrics](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics)
 
@@ -126,6 +140,7 @@ Other links:
 
 # Visualization
 
+instructions here
 https://github.com/prometheus-operator/kube-prometheus#access-the-dashboards
 
 https://github.com/prometheus-operator/kube-prometheus/blob/main/docs/exposing-prometheus-alertmanager-grafana-ingress.md
@@ -134,10 +149,16 @@ https://github.com/prometheus-operator/kube-prometheus/blob/main/docs/exposing-p
 
 Deploy an ingress?
 
+Port forward:
+kubectl port-forward -n monitoring service/prometheus-k8s 9090
+
 ## Grafana
 
 Deploy an ingress?
 
+Port forward:
+kubectl port-forward -n monitoring grafana-665447c488-cwhbm 3000
 
 # Other References:
 * [Youtube: How Prometheus Monitoring works | Prometheus Architecture explained](https://www.youtube.com/watch?v=h4Sl21AKiDg)
+* [Robust Perception blog](https://www.robustperception.io/blog)

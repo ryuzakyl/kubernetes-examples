@@ -78,6 +78,13 @@ For installation instructions and more details check [here](kube-state-metrics/R
 # Istio
 <a id="istio-section"></a>
 
+The idea here is how to monitor istio with Prometheus or anoher tool (Sysdig, etc.)
+
+* https://istio.io/latest/docs/examples/microservices-istio/logs-istio/#:~:text=With%20Istio%2C%20you%20gain%20monitoring,series%20database%20and%20monitoring%20system%20.
+* https://istio.io/latest/docs/concepts/observability/
+* (has an istio architecture image) https://sysdig.com/blog/monitor-istio/
+* https://www.giantswarm.io/blog/istio-monitoring-explained
+
 # Datadog
 
 Kubernetes includes several useful monitoring tools, both as built-in features and cluster add-ons. The available tooling is valuable for spot checks and retrieving metric snapshots, and can even display several minutes of monitoring data in some cases.

@@ -19,6 +19,12 @@ we can use the following [tutorial](https://www.datadoghq.com/blog/monitoring-ku
 * https://docs.datadoghq.com/agent/kubernetes/?tab=operator
 * https://docs.datadoghq.com/agent/kubernetes/prometheus/
 
+
+**Collecting from Prometheus:**
+* https://datadoghq.dev/integrations-core/base/prometheus/
+* https://docs.datadoghq.com/integrations/prometheus/
+* https://docs.datadoghq.com/agent/kubernetes/prometheus/
+
 # The Datadog Cluster Agent
 
 # The node-based Agent
@@ -39,6 +45,11 @@ Check [here](https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/#
 
 Check [this](https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/#enable-apm-in-your-kubernetes-cluster).
 
-# References:
+# Datadog vs. Prometheus
+
+https://www.reddit.com/r/kubernetes/comments/cankxz/do_you_prefer_prometheus_or_datadog_for/
+
+# Other References:
 * https://www.datadoghq.com/blog/how-to-collect-and-graph-kubernetes-metrics/
 * https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/
+* https://www.metricfire.com/blog/prometheus-vs-datadog/
