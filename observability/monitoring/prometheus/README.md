@@ -2,7 +2,7 @@ Prometheus is an open source, metrics-based monitoring system. It has a simple y
 
 Prometheus pulls metrics (key/value) and stores the data as time-series, allowing users to query data and alert in a real-time fashion. At given intervals, Prometheus will hit targets to collect metrics, aggregate data, show data, or even alert if some thresholds are met.
 
-For instrumenting your own code, Prometheus has client libraries for applications written in Go, Java, Ruby, and Python. Other languages like C#, Node.js, or Rust have support as well, but they’re not official (yet). And for those short-lived applications like batch jobs, Prometheus can push metrics with a [PushGateway](https://github.com/prometheus/pushgateway).
+For instrumenting your own code, Prometheus has client libraries for applications written in Go, Java, Ruby, and Python. Other languages like C#, Node.js, or Rust have support as well, but they’re not official (yet). And for those `short-lived` applications like batch jobs, Prometheus can push metrics with a [PushGateway](https://github.com/prometheus/pushgateway).
 
 > :bulb: **NOTE**
 >
@@ -37,14 +37,50 @@ In this case, `direct instrumentation` is not an option because we can’t use `
 * Turn those statistics into Prometheus metrics, using a `client library`.
 * Enables the `/metrics` endpoint, and have that URL display the system metrics
 
+> :memo: NOTE
+>
+> A list of **exporters** can be found [here](https://prometheus.io/docs/instrumenting/exporters/).
+
 > :bulb: INFO
+>
 > The **exporters** can be deployed alongside the applications whose metrics you're interested in.
 
 For more details about **exporters** read [this](https://alanstorm.com/what-are-prometheus-exporters), [this](https://prometheus.io/docs/instrumenting/exporters/) and/or [this](https://www.metricfire.com/blog/first-contact-with-prometheus/).
 
 **Clients libraries/SDKs**
 
+The officially provided `client libraries` include go, java, scala, python, ruby, and many other libraries developed by third parties, supporting nodejs, php, erlang, etc.
+
 Client libraries handle all the essential details, such as bookkeeping or thread-safety, and sends out your metrics in a format that can be directly scraped by Prometheus, leaving the user with very little to do. Most libraries also provide certain metrics such as CPU usage and garbage collection statistics out of the box depending on the runtime environment and the library being used.
+
+**PushGateway**
+
+What if we have `short-lived` or batch jobs whose lifespan is shorter than the Prometheus scrape interval? In order to be able to collect those metrics, we must use the Prometheus `PushGateway`. Since these kinds of jobs may not exist long enough for Prometheus to scrape them, they can instead push their metrics to a Push Gateway, which acts as kind of a metric cache, holding them long enough so they can be scraped by Prometheus.
+
+> :eyes: ATTENTION
+>
+> This method is mainly used for `service-level` metrics. For machine-level metrics, [`node exporter`](https://prometheus.io/docs/guides/node-exporter) is required.
+
+Read [this](https://www.metricfire.com/blog/prometheus-pushgateways-everything-you-need-to-know/) for more info.
+
+**Alertmanager**
+
+The Prometheus Alertmanager allows you to define your own alerts on the collected metrics, so that you can be notified in case of any abnormalities or discrepancies in the data collected. Using various available integrations, the alert manager can be used to send alerts directly via SMS, email, Slack, PagerDuty, etc.
+
+To know more, read [this](https://www.metricfire.com/blog/top-5-prometheus-alertmanager-gotchas/).
+
+**Service Discovery**
+
+Prometheus offers a variety of [service discovery options](https://github.com/prometheus/prometheus/tree/main/discovery) for discovering scrape targets, including [Kubernetes](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#kubernetes_sd_config), [Consul](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#consul_sd_config), and many others.
+
+If you need to use a service discovery system that is not currently supported, your use case may be best served by Prometheus' [file-based service discovery](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#file_sd_config) mechanism, which enables you to list scrape targets in a `JSON` file (along with metadata about those targets).
+
+For more information, read [this](https://github.com/prometheus/prometheus/tree/main/discovery) or [this](https://prometheus.io/blog/2018/07/05/implementing-custom-sd/).
+
+**Visualization**
+The metrics collected by Prometheus are stored locally in a time series database. With the help of the [Prometheus Query Language](https://www.metricfire.com/blog/getting-started-with-promql/) (PromQL), a user can select and aggregate existing time series data in real time. The result can *mainly* be shown as graphs or tabular data in two places:
+1. The integrated [Prometheus Expression Browser](https://www.metricfire.com/blog/prometheus-dashboards/#Prometheus-Expression-Browser) or,
+2. An external visualization integration via the use of an HTTP API. The external integration of choice for Prometheus visualization would be [Grafana](https://prometheus.io/docs/visualization/grafana/).
 
 # Install
 
