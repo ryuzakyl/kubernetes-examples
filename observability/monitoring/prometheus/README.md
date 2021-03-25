@@ -1,5 +1,50 @@
+Prometheus is an open source, metrics-based monitoring system. It has a simple yet powerful data model and a query language that lets you analyse how your applications and infrastructure are performing.
 
-General description about Prometheus.
+Prometheus pulls metrics (key/value) and stores the data as time-series, allowing users to query data and alert in a real-time fashion. At given intervals, Prometheus will hit targets to collect metrics, aggregate data, show data, or even alert if some thresholds are met.
+
+For instrumenting your own code, Prometheus has client libraries for applications written in Go, Java, Ruby, and Python. Other languages like C#, Node.js, or Rust have support as well, but they’re not official (yet). And for those short-lived applications like batch jobs, Prometheus can push metrics with a [PushGateway](https://github.com/prometheus/pushgateway).
+
+> :bulb: **NOTE**
+>
+> Keep in mind that the preferable way to collect data is to pull metrics from an application’s endpoint.
+
+# Architecture
+
+Prometheus is composed of multiple components, each onea having a specific function. These are:
+
+![Prometheus Architecture](assets/images/prometheus-architecture.JPEG)
+
+**The Prometheus Server**
+Responsible for pulling and storing monitoring data from Exporter and providing a flexible query language (`PromQL`)
+
+* **Retrieval**: sampling module
+* **TSDB**: The storage module defaults to local storage as tsdb
+* **HTTP Server**: Provide http interface query and panel, the default port is **9090**
+
+It collects metrics in the form of time series data from nodes and stores them. The process of collecting metrics is referred to as scraping. Prometheus server does all the heavy lifting. All they have to do is expose their metrics in a way that the Prometheus server can access. They do this by exposing an HTTP endpoint, usually /metrics, which returns the full list of metrics (with accompanying label sets) and their values.
+
+**Exporters/Jobs**
+As mentioned earlier, clients simply have to expose their metrics for Prometheus to scrape, but this data has to be in a format that Prometheus understands. Prometheus stores data in a time series format, and only accepts data of that form. Metrics exposed by clients have to be in this format for Prometheus to scrape. However, time series formatted metrics do not typically spring forth from applications.
+
+Instrumentation that produces these types of metrics often has to be manually added.This can be done in two ways:
+
+1. We have **control of the source code** of the application whose metrics you want sent to Prometheus.
+With very few lines of code, you can define and add your desired metrics using Prometheus' `client libraries` in a process called `direct instrumentation`.
+
+2. We **do NOT have control of the source code** of the application/service we want to monitor.
+In this case, `direct instrumentation` is not an option because we can’t use `client libraries` to export the metrics. In this case, we use [exporters](https://prometheus.io/docs/instrumenting/exporters/). Exporters are pieces of software that:
+* Fetches statistics from another, non-Prometheus system
+* Turn those statistics into Prometheus metrics, using a `client library`.
+* Enables the `/metrics` endpoint, and have that URL display the system metrics
+
+> :bulb: INFO
+> The **exporters** can be deployed alongside the applications whose metrics you're interested in.
+
+For more details about **exporters** read [this](https://alanstorm.com/what-are-prometheus-exporters), [this](https://prometheus.io/docs/instrumenting/exporters/) and/or [this](https://www.metricfire.com/blog/first-contact-with-prometheus/).
+
+**Clients libraries/SDKs**
+
+Client libraries handle all the essential details, such as bookkeeping or thread-safety, and sends out your metrics in a format that can be directly scraped by Prometheus, leaving the user with very little to do. Most libraries also provide certain metrics such as CPU usage and garbage collection statistics out of the box depending on the runtime environment and the library being used.
 
 # Install
 
@@ -26,10 +71,6 @@ Several approaches:
 
 
 4:40 (https://www.youtube.com/watch?v=QoDqxm7ybLc) explanation of kubernetes objects created and their function
-
-# Architecture
-
-* (Prometheus basic architecture) https://www.programmersought.com/article/16474076685/
 
 # Metric Types
 
@@ -123,6 +164,8 @@ https://valyala.medium.com/analyzing-prometheus-data-with-external-tools-5f3e5e1
 
 # Scaling Prometheus with Cortex
 
+Talk about MetricFire?
+
 Why do need this? min 20:00 of https://www.youtube.com/watch?v=h4Sl21AKiDg
 
 Handling hundreds of services we might want to have multiple Prometheus servers that aggregate all these metrics data and configuring that and scaling Prometheus in that way can be very difficult.
@@ -137,6 +180,10 @@ Other links:
 * https://www.cncf.io/blog/2018/12/18/cortex-a-multi-tenant-horizontally-scalable-prometheus-as-a-service/
 * https://grafana.com/go/webinar/taking-prometheus-to-scale-with-cortex/
 * https://platform9.com/blog/kubernetes-monitoring-at-scale-with-prometheus-and-cortex/
+
+# PromQL?
+
+https://www.metricfire.com/blog/getting-started-with-promql/
 
 # Visualization
 
@@ -161,4 +208,7 @@ kubectl port-forward -n monitoring grafana-665447c488-cwhbm 3000
 
 # Other References:
 * [Youtube: How Prometheus Monitoring works | Prometheus Architecture explained](https://www.youtube.com/watch?v=h4Sl21AKiDg)
+* [What is Prometheus?](https://www.metricfire.com/blog/what-is-prometheus/)
 * [Robust Perception blog](https://www.robustperception.io/blog)
+* [Prometheus: Up & Running](https://www.oreilly.com/library/view/prometheus-up/9781492034131/ch01.html)
+* https://www.programmersought.com/article/16474076685/
