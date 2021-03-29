@@ -1,22 +1,22 @@
-https://www.youtube.com/watch?v=gauOI0O9fRM
-/media/ryuzakyl/Data/projects/github/thesandlord/Istio101
-
 # `fruits` deployment
 
 * https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
 
-# (sandlord) `json time` app
-
-* https://www.youtube.com/watch?v=gauOI0O9fRM
-* http://time.jsontest.com/
-
 # `kubernetes-dashboard`
 
-instructions on this folder
+**To be documented.** (instructions on this folder)
 
 # `bookinfo` app
 
-instructions on this folder
+**To be documented.** (instructions on this folder)
+
+# (sandlord) `json time` app
+
+**To be documented.**
+
+* https://www.youtube.com/watch?v=gauOI0O9fRM
+* http://time.jsontest.com/
+...projects/github/thesandlord/Istio101
 
 # GCP's `Online Boutique`
 
