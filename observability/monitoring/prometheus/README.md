@@ -49,7 +49,7 @@ For more details about **exporters** read [this](https://alanstorm.com/what-are-
 
 **Clients libraries/SDKs**
 
-The officially provided `client libraries` include go, java, scala, python, ruby, and many other libraries developed by third parties, supporting nodejs, php, erlang, etc.
+The officially provided [`client libraries`](https://prometheus.io/docs/instrumenting/clientlibs/) include go, java, scala, python, ruby, and many other libraries developed by third parties, supporting nodejs, php, erlang, etc.
 
 Client libraries handle all the essential details, such as bookkeeping or thread-safety, and sends out your metrics in a format that can be directly scraped by Prometheus, leaving the user with very little to do. Most libraries also provide certain metrics such as CPU usage and garbage collection statistics out of the box depending on the runtime environment and the library being used.
 
@@ -82,31 +82,62 @@ The metrics collected by Prometheus are stored locally in a time series database
 1. The integrated [Prometheus Expression Browser](https://www.metricfire.com/blog/prometheus-dashboards/#Prometheus-Expression-Browser) or,
 2. An external visualization integration via the use of an HTTP API. The external integration of choice for Prometheus visualization would be [Grafana](https://prometheus.io/docs/visualization/grafana/).
 
-# Install
+# Installation
 
-manifests are in folder:
-https://github.com/prometheus-operator/kube-prometheus/tree/main/manifests
+The Prometheus installation on Kubernetes can be rather complex. There are several installation approaches:
+1. Manually create and apply (in the required order) all config files
+2. Using an operator (Manager of Prometheus components)
+3. Use a **Helm chart** or **manifests** to deploy the operator
 
-locally we can find them on `observability/monitoring/prometheus/manifests`.
+We chose to install it via the **manifests**. All the [manifests](https://github.com/prometheus-operator/kube-prometheus/tree/main/manifests) applied are taken from the official [`kube-prometheus`](https://github.com/prometheus-operator/kube-prometheus).
 
-the commands are the following:
+> :memo: NOTE
+>
+> The manifests are stored in this repo on folder `observability/monitoring/prometheus/manifests`.
+
+The [installation instructions](https://github.com/prometheus-operator/kube-prometheus#apply-the-kube-prometheus-stack) are the following:
 ```console
-# Update the namespace and CRDs, and then wait for them to be available before creating the remaining resources
+$ cd observability/monitoring/prometheus
 $ kubectl apply -f manifests/setup
 $ kubectl apply -f manifests/
 ```
 
-https://github.com/prometheus-operator/kube-prometheus#apply-the-kube-prometheus-stack
+Once installed, check the `monitoring` namespace and make sure the pods are running. **Prometheus** and **Grafana** should be up and running soon.
 
-https://www.youtube.com/watch?v=QoDqxm7ybLc
+## Installed Kubernetes objects
 
-Several approaches:
-1. Manually create and apply (in the required order) all config files
-2. Using an operator (Manager of Prometheus components)
-3. User Helm chart to deploy the operator
+We'll explore the Kubernetes objects created by the installation starting with the higher level objects and ending with the lowest level objects (i.e., pods).
+
+### StatefulSets
+
+From the installation, 2 **StatefulSets** are created (see image): one for the `Prometheus Server` (with 2 pods) and the other one for the `Alertmanager` (with 3 pods).
+
+![Prometheus StatefulSets](assets/images/prom-statefulsets.png)
+
+### Deployments
+
+In this case, 5 **Deployments** are created (see image):
+
+![Prometheus Deployments](assets/images/prom-deployments.png)
+
+Those are:
+* `deployment.apps/blackbox-exporter` (1 pod):
+
+sss
+
+![Prometheus Deployments](assets/images/blackbox-exporter-service.png)
+
+* `deployment.apps/grafana` (1 pod):
+for the `Grafana` service, which will be briefly discussed in further sections.
+
+* `deployment.apps/kube-state-metrics` (1 pod):
+for the `kube-state-metrics` service in order to collect metrics from Kubernetes *objects*. For more details on what it is or how to deploy it standalone, read [this](../kube-state-metrics/README.md).
 
 
-4:40 (https://www.youtube.com/watch?v=QoDqxm7ybLc) explanation of kubernetes objects created and their function
+* `deployment.apps/prometheus-adapter`
+
+* `deployment.apps/prometheus-operator`
+
 
 # Metric Types
 
@@ -122,41 +153,7 @@ Talk about OpenMetrics: https://www.robustperception.io/openmetrics-is-released
 
 [Software exposing Prometheus metrics](https://prometheus.io/docs/instrumenting/exporters/#software-exposing-prometheus-metrics)
 
-# Exporters and monitoring Applications
-
-https://www.scalyr.com/blog/prometheus-metrics-by-example/
-https://www.youtube.com/watch?v=h4Sl21AKiDg
-
-Describe scenarios of using and writing exporters to expose Prometheus metrics at `/metrics` and instrumenting your applications with Prometheus client libraries.
-
-## Exporters
-
-https://prometheus.io/docs/instrumenting/exporters/
-
-* DB
-* Hardware
-* Issue Trackers and CI
-* Messaging systems
-* Storage
-* HTTP
-* APIs
-* Logging
-* Other monitoring systems
-* Miscellaneous
-
-## Monitoring Applications
-
-Example of metrics for your app:
-* How many requests?
-* How many exceptions?
-* How many server resources are used?
-
-USE method (http://www.brendangregg.com/usemethod.html) and TSA method (http://www.brendangregg.com/tsamethod.html)?
-
-https://prometheus.io/docs/instrumenting/clientlibs/
-https://github.com/prometheus/client_python
-
-# Pull system
+# Pull vs. Push
 
 Advantages over push approach of New Relic or Amazon Cloud Watch
 

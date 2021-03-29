@@ -2,7 +2,7 @@
 # . https://github.com/MartinHeinz/python-project-blueprint/blob/master/Makefile#L12
 
 # This version-strategy uses git tags to set the version string
-TAG := v0.1
+TAG := v0.0.1
 
 ROOTDIR := $(realpath .)
 
@@ -82,9 +82,6 @@ On_ICyan=\033[0;106m    # Cyan
 On_IWhite=\033[0;107m   # White
 
 # -------------------------------------------------
-
-run:
-	@echo $(TAG)
 
 version:
 	@echo $(TAG)
@@ -174,14 +171,10 @@ get-dashboard-login-token:
 	@echo "Token to access the Kubernetes Dashboard:";
 	@echo $(TOKEN)
 
-generate-dashboard-certificate:
-	@echo "WIP"
-
 deploy-dashboard-path-ingress:
-	@echo "WIP: uses generate-dashboard-certificate and generate secret"
-
-deploy-dashboard-host-ingress:
-	@echo "WIP: uses generate-dashboard-certificate and generate secret"
+	@echo "Deploying ingress for Kubernetes Dashboard...";
+	@kubectl apply -f ingress/kubernetes-dashboard/dashboard-ingress-path.yaml
+	@echo "Visit Kubernetes Dashboard at /kubernetes-dashboard";
 
 deploy-kube-state-metrics:
 	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/service-account.yaml

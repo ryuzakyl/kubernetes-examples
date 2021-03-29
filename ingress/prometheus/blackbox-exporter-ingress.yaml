@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: blackbox-exporter-ingress
+  namespace: monitoring
+  annotations:
+    # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/blackbox-exporter)$ $1/ redirect;
+spec:
+  rules:
+    - http:
+        paths:
+        - pathType: Prefix
+          path: /blackbox-exporter(/|$)(.*)
+          backend:
+            service:
+              name: blackbox-exporter
+              port:
+                number: 19115
