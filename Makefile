@@ -143,7 +143,7 @@ endif
 
 deploy-nginx-ingress-controller:
 	@echo "Deploying NGINX Ingress for KinD..."
-	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
+	@kubectl apply -f ingress/providers/kind/deploy.yaml
 	@echo ""
 	@echo "Monitor status with: 'watch kubectl get all -n ingress-nginx'"
 
@@ -157,13 +157,13 @@ setup-ingress-demo-fruits:
 
 deploy-kubernetes-dashboard:
 	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
-	@kubectl apply -f deployments-k8s/kubernetes-dashboard/cluster-role-binding.yaml
-	@kubectl apply -f deployments-k8s/kubernetes-dashboard/dashboard-adminuser.yaml
+	@kubectl apply -f deployments/kubernetes-dashboard/cluster-role-binding.yaml
+	@kubectl apply -f deployments/kubernetes-dashboard/dashboard-adminuser.yaml
 
 uninstall-kubernetes-dashboard:
 	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
-	@kubectl delete -f deployments-k8s/kubernetes-dashboard/dashboard-adminuser.yaml
-	@kubectl delete -f deployments-k8s/kubernetes-dashboard/cluster-role-binding.yaml
+	@kubectl delete -f deployments/kubernetes-dashboard/dashboard-adminuser.yaml
+	@kubectl delete -f deployments/kubernetes-dashboard/cluster-role-binding.yaml
 
 get-dashboard-login-token:
 	$(eval ADMIN_SECRET_NAME := $(shell kubectl -n kubernetes-dashboard get sa/admin-user -o jsonpath="{.secrets[0].name}"))
