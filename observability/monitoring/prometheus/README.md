@@ -121,7 +121,7 @@ In this case, 5 **Deployments** are created (see image):
 ![Prometheus Deployments](assets/images/prom-deployments.png)
 
 Those are:
-* `deployment.apps/blackbox-exporter` (1 pod) (for more information, read [this](https://lapee79.github.io/en/article/monitoring-http-using-blackbox-exporter/)):
+* `deployment.apps/blackbox-exporter` (1 pod) (for more information, read [this](https://lapee79.github.io/en/article/monitoring-http-using-blackbox-exporter/), [this](https://lyz-code.github.io/blue-book/devops/prometheus/blackbox_exporter/) or [this](https://www.digitalocean.com/community/tutorials/how-to-install-prometheus-on-ubuntu-16-04)):
 
 The [`blackbox exporter`](https://github.com/prometheus/blackbox_exporter) can monitor the external services on Prometheus. In order to achieve that, it generates metrics derived from probing endpoints to determine availability, response time, and more; all this over protocols like HTTP, HTTPS, DNS, TCP and ICMP.
 
@@ -130,6 +130,9 @@ The [`blackbox exporter`](https://github.com/prometheus/blackbox_exporter) can m
 > ```console
 > $ kubectl port-forward -n monitoring svc/blackbox-exporter 19115
 > ```
+> We can also visit this service's home page for more details:
+>
+> ![Blackbox Exporter home](assets/images/blackbox-exporter-home.png)
 
 `blackbox-exporter` service configuration:
 

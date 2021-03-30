@@ -2,6 +2,13 @@
 
 * https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
 
+# foo, httpbin, sleep
+
+https://github.com/istio/istio/tree/master/samples
+
+Instructions:
+(Section 'Install the Sample Applications' of ) https://betterprogramming.pub/how-to-authorize-non-kubernetes-clients-with-istio-on-your-k8s-cluster-8a90fe95b137
+
 # `kubernetes-dashboard`
 
 **To be documented.** (instructions on this folder)
