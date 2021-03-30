@@ -121,11 +121,33 @@ In this case, 5 **Deployments** are created (see image):
 ![Prometheus Deployments](assets/images/prom-deployments.png)
 
 Those are:
-* `deployment.apps/blackbox-exporter` (1 pod):
+* `deployment.apps/blackbox-exporter` (1 pod) (for more information, read [this](https://lapee79.github.io/en/article/monitoring-http-using-blackbox-exporter/)):
 
-sss
+The [`blackbox exporter`](https://github.com/prometheus/blackbox_exporter) can monitor the external services on Prometheus. In order to achieve that, it generates metrics derived from probing endpoints to determine availability, response time, and more; all this over protocols like HTTP, HTTPS, DNS, TCP and ICMP.
 
-![Prometheus Deployments](assets/images/blackbox-exporter-service.png)
+> :memo: NOTE
+> To test the deployment is working correctly, we'll use a `port-forward` exposing the HTTP port version of the corresponding pod:
+> ```console
+> $ kubectl port-forward -n monitoring svc/blackbox-exporter 19115
+> ```
+
+`blackbox-exporter` service configuration:
+
+![Blackbox Exporter service](assets/images/blackbox-exporter-service.png)
+
+If we issue a request to [http://localhost:19115/probe?target=google.com&module=http_2xx](http://localhost:19115/probe?target=google.com&module=http_2xx), we'll see the collected metrics for the probed `target=google.com`:
+
+![Probed target metrics](assets/images/probed-metrics.png)
+
+> :eyes:
+> It is important to know the status of the probe: if the value of `probe_success` metrics is `1`, it means success. A `0` means failure.
+> ![Probe success](assets/images/probe-success.png)
+
+Adding a `debug=true` parameter will return debug information for that probe:
+
+![Probe debug](assets/images/probe-debug.png)
+
+In case the user would like to make this service available outside the cluster, please check the ingress resource defined for that here: `ingress/prometheus/blackbox-exporter-ingress.yaml`.
 
 * `deployment.apps/grafana` (1 pod):
 for the `Grafana` service, which will be briefly discussed in further sections.
@@ -133,8 +155,15 @@ for the `Grafana` service, which will be briefly discussed in further sections.
 * `deployment.apps/kube-state-metrics` (1 pod):
 for the `kube-state-metrics` service in order to collect metrics from Kubernetes *objects*. For more details on what it is or how to deploy it standalone, read [this](../kube-state-metrics/README.md).
 
-
 * `deployment.apps/prometheus-adapter`
+
+adapter:
+https://github.com/kubernetes-sigs/prometheus-adapter
+https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/docs/walkthrough.md
+https://itnext.io/autoscale-kubeless-functions-with-prometheus-adapter-f99507a23db6
+https://www.metricfire.com/blog/prometheus-metrics-based-autoscaling-in-kubernetes/
+https://hackernoon.com/how-to-use-prometheus-adapter-to-autoscale-custom-metrics-deployments-p1p3tl0
+
 
 * `deployment.apps/prometheus-operator`
 
@@ -225,7 +254,7 @@ https://github.com/prometheus-operator/kube-prometheus#access-the-dashboards
 
 https://github.com/prometheus-operator/kube-prometheus/blob/main/docs/exposing-prometheus-alertmanager-grafana-ingress.md
 
-## Prometheus UI
+## Prometheus Expression Browser
 
 Deploy an ingress?
 
@@ -238,6 +267,8 @@ Deploy an ingress?
 
 Port forward:
 kubectl port-forward -n monitoring grafana-665447c488-cwhbm 3000
+
+https://yitaek.medium.com/practical-monitoring-with-prometheus-grafana-part-ii-5020be20ebf6
 
 # Other References:
 * [Youtube: How Prometheus Monitoring works | Prometheus Architecture explained](https://www.youtube.com/watch?v=h4Sl21AKiDg)

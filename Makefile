@@ -190,7 +190,11 @@ uninstall-kube-state-metrics:
 	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/service.yaml
 	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/deployment.yaml
 
-
+deploy-prometheus-stack:
+	@kubectl apply -f observability/monitoring/prometheus/manifests/setup
+	@kubectl apply -f observability/monitoring/prometheus/manifests/
+	@echo "Check deployment status with the following command:";
+	@echo "watch kubectl get all -n monitoring";
 
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
 # https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/
