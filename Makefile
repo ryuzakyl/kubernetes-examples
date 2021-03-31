@@ -150,10 +150,11 @@ deploy-nginx-ingress-controller:
 check-nginx-ingress-controller:
 	@curl -k https://localhost
 
-setup-ingress-demo-fruits:
-	@kubectl apply -f $(ROOTDIR)/ingress/demos/fruits/fruits-namespace.yaml
-	@kubectl apply -f $(ROOTDIR)/ingress/demos/fruits/apple-resources.yaml
-	@kubectl apply -f $(ROOTDIR)/ingress/demos/fruits/banana-resources.yaml
+deploy-fruits-demo:
+	@kubectl apply -f deployments/fruits/
+
+deploy-fruits-ingress:
+	@kubectl apply -f ingress/fruits/fruits-ingress.yaml
 
 deploy-kubernetes-dashboard:
 	@kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0/aio/deploy/recommended.yaml
@@ -191,10 +192,16 @@ uninstall-kube-state-metrics:
 	@kubectl delete -f https://raw.githubusercontent.com/kubernetes/kube-state-metrics/master/examples/standard/deployment.yaml
 
 deploy-prometheus-stack:
+	@echo "Deploying Prometheus monitoring stack";
 	@kubectl apply -f observability/monitoring/prometheus/manifests/setup
 	@kubectl apply -f observability/monitoring/prometheus/manifests/
 	@echo "Check deployment status with the following command:";
 	@echo "watch kubectl get all -n monitoring";
+
+uninstall-prometheus-stack:
+	@echo "Uninstalling Prometheus monitoring stack";
+	@kubectl delete -f observability/monitoring/prometheus/manifests/
+	@kubectl delete -f observability/monitoring/prometheus/manifests/setup
 
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
 # https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/

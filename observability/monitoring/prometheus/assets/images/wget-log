@@ -1,0 +1,8 @@
+Will not apply HSTS. The HSTS database must be a regular and non-world-writable file.
+ERROR: could not open HSTS store at '/home/ryuzakyl/.wget-hsts'. HSTS will be disabled.
+--2021-03-30 17:03:44--  https://firebasestorage.googleapis.com/v0/b/hackernoon-app.appspot.com/o/images%2FkaGFDumlYXRgWiJ4IylKb6uaYLs1-q7ly3u6a.jpeg?alt=media
+Resolving firebasestorage.googleapis.com (firebasestorage.googleapis.com)... 2a00:1450:4003:80a::200a, 142.250.178.170
+Connecting to firebasestorage.googleapis.com (firebasestorage.googleapis.com)|2a00:1450:4003:80a::200a|:443... connected.
+HTTP request sent, awaiting response... 403 Forbidden
+2021-03-30 17:03:44 ERROR 403: Forbidden.
+
