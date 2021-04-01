@@ -289,13 +289,24 @@ For more details, please read [this](https://sysdig.com/blog/openmetrics-is-prom
 
 # Pull vs. Push
 
-Advantages over push approach of New Relic or Amazon Cloud Watch
+Monitoring systems generally fall into two categories: those where services `push metrics` to the monitoring system and those where the monitoring system `pulls metrics` from services.
 
-min 12:00 of https://www.youtube.com/watch?v=h4Sl21AKiDg
+Prometheus falls primarily into the `pull` category as it is a descendant of the `Borgmon` monitoring system. `Borgmon` was used to monitor the work scheduling system called `Borg` at Google which later became `Kubernetes`.
 
-* (push vs. pull) https://giedrius.blog/2019/05/11/push-vs-pull-in-monitoring-systems/
-* https://prometheus.io/blog/2016/07/23/pull-does-not-scale-or-does-it/#:~:text=A%20pull%20approach%20not%20only,or%20inspect%20metrics%20endpoints%20manually.
-* https://thenewstack.io/exploring-prometheus-use-cases-brian-brazil/
+There's an [ongoing debate](https://thenewstack.io/exploring-prometheus-use-cases-brian-brazil/) regarding the *pull vs. push* and we'll briefly talk about it here.
+
+In favor of the `pull` approach, Julius Voltz (one of Prometheus creator) states:
+
+> A `pull` approach usually requires less configuration and it also makes your monitoring setup more flexible. With `pull`, you can just run a copy of production monitoring on your laptop to experiment with it. It also allows you just fetch metrics with some other tool or inspect metrics endpoints manually.
+>
+> To get high availability, `pull` allows you to just run two identically configured Prometheus servers in parallel. And lastly, if you have to move the endpoint under which your monitoring is reachable, a `pull` approach does not require you to reconfigure all of your metrics sources.
+
+In favor of the `push` approach, it is easier to implement Replication To Different Ingestion Points. This means that since it is all initiated by the client itself it becomes easier to replicate the same traffic to different servers. You just need to transmit it to more than one target IP address.
+
+
+Also, it is easier to Mmdel Shortlived Batch-Jobs and all of the receivers will get the same exact data. If you would spin up two different instances of Prometheus (which uses the HTTP pull method) then they most likely will not have the same exact data.
+
+For more information check [this](https://prometheus.io/blog/2016/07/23/pull-does-not-scale-or-does-it/), [this](https://www.youtube.com/watch?v=h4Sl21AKiDg&t=723s) and [this](https://giedrius.blog/2019/05/11/push-vs-pull-in-monitoring-systems/).
 
 # Prometheus rules
 
@@ -410,64 +421,171 @@ If there are any syntax errors or invalid input arguments, it prints an error me
 
 # Prometheus Data Storage
 
-By default Prometheus store data on SSD/HDD, but it can be integrated with Remote Storage Systems (i.e., relational DBs, etc.) and the data is stored in a Custom Time Series Format
+Prometheus has a sophisticated local storage subsystem. For indexes, it uses [LevelDB](https://github.com/google/leveldb). For the bulk sample data, it has its own custom storage layer, which organizes sample data in chunks of constant size (1024 bytes payload). These chunks are then stored on disk in one file per time series.
 
-## Integration with Remote Storage Systems
+By default, Prometheus store data on SSD/HDD, but it can be integrated with Remote Storage Systems (i.e., relational DBs, etc.) and the data is stored in a `Custom Time Series Format`.
 
-[Remote storage integrations](https://prometheus.io/docs/prometheus/latest/storage/#remote-storage-integrations)
+For more advanced configuration setttings, please check [this](https://prometheus.io/docs/prometheus/latest/storage). To dive deeper into the topic, check out the following:
+* The Prometheus Time Series Database
+    * [The Prometheus Time Series Database](https://www.youtube.com/watch?v=HbnGSNEjhUc)
+    * [TSDB format](https://github.com/prometheus/prometheus/blob/release-2.26/tsdb/docs/format/README.md)
+    * [Prometheus storage: technical terms for humans](https://valyala.medium.com/prometheus-storage-technical-terms-for-humans-4ab4de6c3d48)
+* Configuring Prometheus for High Performance
+    * [Configuring Prometheus for High Performance](https://www.youtube.com/watch?v=hPC60ldCGm8)
+    * [How to Scale Prometheus for Kubernetes](https://epsagon.com/development/how-to-scale-prometheus-for-kubernetes/)
 
-https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage
-https://valyala.medium.com/analyzing-prometheus-data-with-external-tools-5f3e5e147639
+Prometheus can be integrated with `Remote Endpoints and Storage`. The [remote write](https://prometheus.io/docs/operating/configuration/#remote_write) and [remote read](https://prometheus.io/docs/operating/configuration/#remote_read) features of Prometheus allow transparently sending and receiving samples. This is primarily intended for long term storage. It is recommended that you perform [careful evaluation of any solution in this space](https://prometheus.io/docs/operating/integrations/#remote-endpoints-and-storage) to confirm it can handle your data volumes.
 
-# Scaling Prometheus with Cortex
+As mentioned before there are a lot of tooling available to enhance a Prometheus-based monitoring solution. A detailed analysis of these tools and solutions is out of the scope of this documentation. Nonetheless, we'll briefly mention some of those here.
 
-Why do need this? min 20:00 of https://www.youtube.com/watch?v=h4Sl21AKiDg
+**Databases**
+* [M3DB](https://m3db.io/)
+    * [Prometheus integration](https://m3db.io/docs/integrations/prometheus/)
+    * [M3db cluster as a Prometheus long term storage](https://medium.com/@sayfeddinehammemi/m3db-cluster-as-a-prometheus-long-term-storage-dfbbb1f6aeb8)
+* [InfluxDB](https://www.influxdata.com/)
+    * [InfluxDB repo](https://github.com/influxdata/influxdb)
+    * [Connect Prometheus to TSDB for InfluxDB](https://www.alibabacloud.com/help/doc-detail/116300.htm)
+* [VictoriaMetrics](https://victoriametrics.com/)
+    * [VictoriaMetrics's docs](https://victoriametrics.github.io/)
+    * [VictoriaMetrics: how to migrate data from Prometheus](https://medium.com/@romanhavronenko/victoriametrics-how-to-migrate-data-from-prometheus-d44a6728f043)
+    * [VictoriaMetrics's GitHub repo](https://github.com/VictoriaMetrics/VictoriaMetrics/)
+* [OpenEBS](https://openebs.io/)
+    * [OpenEBS's docs](https://docs.openebs.io/v150/)
+    * [Using OpenEBS as TSDB for Prometheus](https://docs.openebs.io/v150/docs/next/prometheus.html)
+    * [Using OpenEBS as the TSDB for Prometheus](https://blog.mayadata.io/openebs/using-openebs-as-the-tsdb-for-prometheus)
 
-Handling hundreds of services we might want to have multiple Prometheus servers that aggregate all these metrics data and configuring that and scaling Prometheus in that way can be very difficult.
+**High Availability**
+* [Thanos](https://thanos.io/)
+    * [Integrations](https://thanos.io/tip/thanos/integrations.md/)
+    * [Thanos GitHub's repo](https://github.com/thanos-io/thanos)
+    * [Prometheus Federation with Thanos](https://coralogix.com/log-analytics-blog/prometheus-federation-with-thanos-how-does-thanos-work/)
+    * [Thanos: Prometheus at Scale](https://www.improbable.io/blog/thanos-prometheus-at-scale)
+* [Cortex](https://cortexmetrics.io/)
+    * [How Prometheus Monitoring works | Prometheus Architecture explained (min 20:00)](https://www.youtube.com/watch?v=h4Sl21AKiDg)
+    * [Cortex's GitHub repo](https://github.com/cortexproject/cortex)
+    * [Cortex: a multi-tenant, horizontally scalable Prometheus-as-a-Service](https://www.cncf.io/blog/2018/12/18/cortex-a-multi-tenant-horizontally-scalable-prometheus-as-a-service/)
+    * [Kubernetes Monitoring at Scale with Prometheus and Cortex](https://platform9.com/blog/kubernetes-monitoring-at-scale-with-prometheus-and-cortex/)
+    * [Cortex Vs Thanos vs Uber's M3](https://www.reddit.com/r/kubernetes/comments/e07mtp/cortex_vs_thanos_vs_ubers_m3_which_is_one_better/)
 
-We can:
-1. Increase capacity of Prometheus server so it can store more metrics data
-2. Limit number of metrics that Prometheus collects from the applications/targets (keep only relevant ones)
-3. Prometheus at scale
-
-Other links:
-* https://github.com/cortexproject/cortex
-* https://www.cncf.io/blog/2018/12/18/cortex-a-multi-tenant-horizontally-scalable-prometheus-as-a-service/
-* https://grafana.com/go/webinar/taking-prometheus-to-scale-with-cortex/
-* https://platform9.com/blog/kubernetes-monitoring-at-scale-with-prometheus-and-cortex/
+**Managed Prometheus solutions**
+* [Logz.io](https://logz.io/)
+    * [Early Access for Logz.io’s Prometheus-as-a-Service](https://logz.io/blog/prometheus-as-a-service/).
+    * [Logz.io infrastructure monitoring](https://logz.io/platform/infrastructure-monitoring/)
+    * [Why We Chose the M3DB Data Store for Logz.io Prometheus-as-a-Service](https://logz.io/blog/m3db-prometheus-as-a-service/)
+* [Metricfire](https://www.metricfire.com/)
+    * [Metricfire hosted Prometheus](https://www.metricfire.com/hosted-prometheus/)
+    * [Monitoring Kubernetes tutorial: using Grafana and Prometheus](https://medium.com/the-metricfire-blog/monitoring-kubernetes-tutorial-using-grafana-and-prometheus-f106091534fb)
 
 # PromQL?
 
-https://www.metricfire.com/blog/getting-started-with-promql/
+The query language used in Prometheus is called [`PromQL`](https://prometheus.io/docs/prometheus/latest/querying/basics/) (Prometheus Query Language). The data can either be viewed as a graph, as tabled data, or in external systems such as `Grafana`, `Zabbix` and others.
+
+`PromQL` is designed for building powerful yet simple queries for graphs, alerts or derived time series (aka [recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)). It is designed from scratch and has zero common grounds with other query languages used in time series databases such as [SQL in TimescaleDB](https://www.timescale.com/), [InfluxQL](https://docs.influxdata.com/influxdb/v1.7/query_language/) or [Flux](https://github.com/influxdata/flux).
+
+This allowed creating a clear language for typical `TSDB` queries. But it has a cost — beginners usually need to spend a few hours reading the [official PromQL docs](https://prometheus.io/docs/prometheus/latest/querying/basics/) before they understand how it works.
+
+For more information please check:
+* [PromQL tutorial for beginners and humans](https://valyala.medium.com/promql-tutorial-for-beginners-9ab455142085)
+* [Introduction to PromQL, the Prometheus Query Language](https://grafana.com/blog/2020/02/04/introduction-to-promql-the-prometheus-query-language/)
+* [PromQL for humans](https://timber.io/blog/promql-for-humans/)
+* [Getting started with PromQL](https://www.metricfire.com/blog/getting-started-with-promql/)
+* [PromQL Example Queries](https://sbcode.net/prometheus/example-queries/)
 
 # Visualization
 
-instructions here
-https://github.com/prometheus-operator/kube-prometheus#access-the-dashboards
-
-https://github.com/prometheus-operator/kube-prometheus/blob/main/docs/exposing-prometheus-alertmanager-grafana-ingress.md
+`Prometheus`, `Grafana`, and `Alertmanager` dashboards can be accessed quickly using `kubectl port-forward` or be exposed outside the cluster via ingress resources (see [here](https://github.com/prometheus-operator/kube-prometheus#access-the-dashboards)).
 
 ## Prometheus Expression Browser
 
-Deploy an ingress?
+The Prometheus service is running on port `9090` but is of type **ClusterIP** (see image) so we need to make it accesible from outside the cluster.
 
-Port forward:
-kubectl port-forward -n monitoring service/prometheus-k8s 9090
+![Prometheus service](assets/images/prometheus-service.png)
+
+Exposing `prometheus-k8s` via `kubectl port-forward` (visit [localhost:9090/](localhost:9090/)),
+```console
+$ kubectl port-forward -n monitoring service/prometheus-k8s 9090
+```
+
+![Prometheus Expression Browser](assets/images/prometheus-ui.png)
+
+> :warning: WARNING
+>
+> Exposing the Prometheus Expression Browser via an `ingress resource` needs some tweaks which, didn't were looked into dept here. For more details about this, please check:
+> * https://stackoverflow.com/questions/59537655/prometheus-dashboard-exposed-over-ingress-controller
+> * https://stackoverflow.com/questions/63227961/the-problem-about-expose-prometheus-web-ui-through-nginx-ingress-controller
+> * https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/user-guides/exposing-prometheus-and-alertmanager.md
 
 ## Grafana
 
-Deploy an ingress?
+[Grafana](https://grafana.com/) allows you to query, visualize, alert on and understand your metrics no matter where they are stored. Create, explore, and share dashboards with your team and foster a data driven culture:
 
-Port forward:
-kubectl port-forward -n monitoring grafana-665447c488-cwhbm 3000
+* **Visualize:** Fast and flexible client side graphs with a multitude of options. Panel plugins offer many different ways to visualize metrics and logs.
+* **Dynamic Dashboards:** Create dynamic & reusable dashboards with template variables that appear as dropdowns at the top of the dashboard.
+* **Explore Metrics:** Explore your data through ad-hoc queries and dynamic drilldown. Split view and compare different time ranges, queries and data sources side by side.
+* **Explore Logs:** Experience the magic of switching from metrics to logs with preserved label filters. Quickly search through all your logs or streaming them live.
+* **Alerting:** Visually define alert rules for your most important metrics. Grafana will continuously evaluate and send notifications to systems like Slack, PagerDuty, VictorOps, OpsGenie.
+* **Mixed Data Sources:** Mix different data sources in the same graph! You can specify a data source on a per-query basis. This works for even custom datasources.
 
-https://yitaek.medium.com/practical-monitoring-with-prometheus-grafana-part-ii-5020be20ebf6
+The `Grafana` service is running on port `3000` (and `30282` on the `node`) and it is of type **NodePort** (see image):
 
-`observability/monitoring/prometheus/manifests/grafana-dashboardDefinitions.yaml`
+![Grafana service](assets/images/grafana-service.png).
 
-USE Method / Cluster
-USE Method / Node
-http://www.brendangregg.com/usemethod.html
+It can be accessed at **&lt;node-ip&gt;:&lt;node-port&gt;**. Next, get obtain such info:
+
+![Get NodePort info](assets/images/nodeport-grafana-service.png)
+
+In our scenario, we can access Grafana at **&lt;172.18.0.4&gt;:&lt;30282&gt;**. On the other hand, a `NodePort` service creates a `ClusterIP` service underneath. Therefore, we can make it accesible from outside the cluster.
+
+Exposing `grafana` via `kubectl port-forward` (visit [localhost:3000](localhost:3000)),
+```console
+kubectl --namespace monitoring port-forward svc/grafana 3000
+```
+
+![Grafana UI](assets/images/grafana-ui.png)
+
+> :eyes: NOTICE
+>
+> The screenshot shows an advanced monitoring indicator: the [`USE Method`](http://www.brendangregg.com/usemethod.html).
+>
+> For the dashboards configuration details seach for "USE Method / Cluster" and "USE Method / Node" on [`observability/monitoring/prometheus/manifests/grafana-dashboardDefinitions.yaml`](../../../observability/monitoring/prometheus/manifests/grafana-dashboardDefinitions.yaml)
+
+> :warning: WARNING
+>
+> If we attempt to expose `Grafana` with an `ingress resource` (available at [`ingress/prometheus/grafana-ingress.yaml`](../../../ingress/prometheus/grafana-ingress.yaml)) we run into the following:
+> ![Grafana Ingress issue](assets/images/grafana-ingress-issue.png)
+> This requires a little more configuration which is outside the scope of these examples. For more information check this:
+> * https://github.com/prometheus-community/helm-charts/issues/201
+> * https://community.grafana.com/t/how-to-configure-grafana-behind-reverse-proxy-ingress-nginx-controller/35937
+> * https://grafana.com/tutorials/run-grafana-behind-a-proxy/
+
+For more information check these:
+* https://prometheus.io/docs/visualization/grafana/
+* https://yitaek.medium.com/practical-monitoring-with-prometheus-grafana-part-ii-5020be20ebf6
+* https://docs.particular.net/samples/logging/prometheus-grafana/
+* https://blog.cloudthat.com/integration-and-visualization-of-prometheus-metrics-in-grafana/
+
+## Alert manager UI
+
+The [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) handles alerts sent by client applications such as the Prometheus server. It takes care of deduplicating, grouping, and routing them to the correct receiver integration such as email, `PagerDuty`, or `OpsGenie`. It also takes care of silencing and inhibition of alerts.
+
+The `Alertmanager` service is running on port `9093` but is of type **ClusterIP** (see image) so we need to make it accesible from outside the cluster.
+
+![Alertmanager service](assets/images/alertmanager-service.png)
+
+Exposing `alertmanager-main` via `kubectl port-forward` (visit [localhost:9093](localhost:9093)),
+```console
+kubectl --namespace monitoring port-forward svc/alertmanager-main 9093
+```
+
+or exposing it via an `ingress resource` (visit [localhost/alert-manager](localhost/alert-manager)):
+
+![Alertmanager UI](assets/images/alert-manager-ui.png).
+
+The `ingress resource` used can be found at [`ingress/prometheus/alert-manager-ingress.yaml`](../../../ingress/prometheus/alert-manager-ingress.yaml).
+
+For more information check these:
+* [Prometheus: Alertmanager Web UI alerts Silence](https://itnext.io/prometheus-alertmanager-web-ui-alerts-silence-2d34fbf2d252)
+* [karma: Alert dashboard for Prometheus Alertmanager](https://karma-dashboard.io/)
 
 # Other References:
 * [Youtube: How Prometheus Monitoring works | Prometheus Architecture explained](https://www.youtube.com/watch?v=h4Sl21AKiDg)
