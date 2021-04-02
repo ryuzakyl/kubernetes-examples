@@ -581,7 +581,7 @@ or exposing it via an `ingress resource` (visit [localhost/alert-manager](localh
 
 ![Alertmanager UI](assets/images/alert-manager-ui.png).
 
-The `ingress resource` used can be found at [`ingress/prometheus/alert-manager-ingress.yaml`](../../../ingress/prometheus/alert-manager-ingress.yaml).
+The `ingress resource` used can be found at [`ingress/prometheus/alert-manager-ingress.yaml`](../../../ingress/prometheus/alert-manager-ingress.yaml)
 
 For more information check these:
 * [Prometheus: Alertmanager Web UI alerts Silence](https://itnext.io/prometheus-alertmanager-web-ui-alerts-silence-2d34fbf2d252)

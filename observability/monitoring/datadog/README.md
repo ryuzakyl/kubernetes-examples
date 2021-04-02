@@ -1,8 +1,12 @@
+> :warning: WARNING
+>
+> This section is **NOT** documented properly. **No** examples were documented so far due to lack of proper tests.
+
 [Datadog](https://www.datadoghq.com/) provides full-stack visibility into Kubernetes environments, with:
 
 * out-of-the-box integrations with Kubernetes, Docker, containerd, and all your containerized applications, so you can see all your metrics, logs, and traces in one place
 
-* Autodiscovery so you can seamlessly monitor applications in large-scale dynamic environments
+* autodiscovery so you can seamlessly monitor applications in large-scale dynamic environments
 
 * advanced monitoring features including outlier and anomaly detection, forecasting, and automatic correlation of observability data
 
