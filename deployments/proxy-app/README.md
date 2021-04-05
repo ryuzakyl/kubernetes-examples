@@ -1,0 +1,1 @@
+https://octopus.com/blog/istio/the-sample-application

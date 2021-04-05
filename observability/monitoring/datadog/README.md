@@ -1,6 +1,9 @@
 > :warning: WARNING
 >
 > This section is **NOT** documented properly. **No** examples were documented so far due to lack of proper tests.
+>
+> :eyes: DISCLAIMER
+> User at your own risk
 
 [Datadog](https://www.datadoghq.com/) provides full-stack visibility into Kubernetes environments, with:
 
@@ -19,10 +22,11 @@ we can use the following [tutorial](https://www.datadoghq.com/blog/monitoring-ku
 
 # The Datadog Agent
 
-* https://www.datadoghq.com/blog/monitoring-kubernetes-with-datadog/
 * https://docs.datadoghq.com/agent/kubernetes/?tab=operator
-* https://docs.datadoghq.com/agent/kubernetes/prometheus/
 
+## Kubernetes installation
+
+* https://docs.datadoghq.com/agent/kubernetes/?tab=daemonset
 
 **Collecting from Prometheus:**
 * https://datadoghq.dev/integrations-core/base/prometheus/
@@ -31,7 +35,11 @@ we can use the following [tutorial](https://www.datadoghq.com/blog/monitoring-ku
 
 # The Datadog Cluster Agent
 
+No documentation here.
+
 # The node-based Agent
+
+No documentation here.
 
 # Control Plane visibility
 
