@@ -8,6 +8,10 @@ ROOTDIR := $(realpath .)
 
 CONFIG_FILE := ingress-enabled-config.yaml
 
+ISTIO_INSTALLER_PATH :=  ~/istio-1.9.0
+PRODUCT_PAGE_URL := productpage:9080/productpage
+
+
 # Reset
 Off=\033[0m       # Text Reset
 
@@ -202,6 +206,13 @@ uninstall-prometheus-stack:
 	@echo "Uninstalling Prometheus monitoring stack";
 	@kubectl delete -f observability/monitoring/prometheus/manifests/
 	@kubectl delete -f observability/monitoring/prometheus/manifests/setup
+
+check-bookinfo-app-is-deployed:
+	$(eval RATINGS_POD := $(shell kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}'))
+	@kubectl exec $(RATINGS_POD) -c ratings -- curl -sS $(PRODUCT_PAGE_URL) | grep -o "<title>.*</title>"
+
+deploy-bookinfo-istio-gateway:
+	@kubectl apply -f $(ISTIO_INSTALLER_PATH)/samples/bookinfo/networking/bookinfo-gateway.yaml
 
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
 # https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/
