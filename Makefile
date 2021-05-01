@@ -95,6 +95,8 @@ kind-install:
 	@chmod +x ./kind
 	@mv ./kind /usr/bin/kind
 
+install-python-packages:
+	pip3 install colorama
 
 create-cluster:
 ifndef name
@@ -207,11 +209,22 @@ uninstall-prometheus-stack:
 	@kubectl delete -f observability/monitoring/prometheus/manifests/
 	@kubectl delete -f observability/monitoring/prometheus/manifests/setup
 
+install-istio:
+	@echo "Installing istio with automatic sidecar injection..."
+	@istioctl install --set profile=demo -y
+	@kubectl label namespace default istio-injection=enabled
+	@echo ""
+	@echo "Please check:";
+	@echo "watch kubectl get all -n istio-system "
+
+deploy-bookinfo-app:
+	@kubectl apply -f $(ISTIO_INSTALLER_PATH)/samples/bookinfo/platform/kube/bookinfo.yaml
+
 check-bookinfo-app-is-deployed:
 	$(eval RATINGS_POD := $(shell kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}'))
 	@kubectl exec $(RATINGS_POD) -c ratings -- curl -sS $(PRODUCT_PAGE_URL) | grep -o "<title>.*</title>"
 
-deploy-bookinfo-istio-gateway:
+deploy-istio-gateway-for-bookinfo:
 	@kubectl apply -f $(ISTIO_INSTALLER_PATH)/samples/bookinfo/networking/bookinfo-gateway.yaml
 
 # https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md

@@ -83,7 +83,7 @@ In order to
 Inside the `istio-system` namespace, we can see a pod for [`istiod`](https://istio.io/latest/blog/2020/istiod/) and [`istio-ingressgateway`](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/):
 ![istio-system pods](assets/images/istio-system-pods.png)
 
-For more information about `Gateway` on Istion, please check [this](https://istio.io/latest/docs/reference/config/networking/gateway/).
+For more information about `Gateway` on `Istio`, please check [this](https://istio.io/latest/docs/reference/config/networking/gateway/) and [this](https://www.alibabacloud.com/blog/north-south-traffic-management-of-istio-gateways-with-answers-from-service-mesh-experts_596658).
 
 ## `istioctl analyze`
 
@@ -112,24 +112,98 @@ $ kubectl label namespace default istio-injection=enabled
 This adds a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later. If we run our analysis again, we see that everything is fine now:
 
 ![Istio configuration OK](assets/images/istio-config-ok.png)
+
 # Istio Ingress Gateway
 
-alternative to NGINX Ingress Controller
-min 13:30 of https://www.youtube.com/watch?v=16fgzklcF7Y
+Along with support for Kubernetes Ingress, Istio offers another configuration model, [Istio Gateway](https://istio.io/latest/docs/reference/config/networking/gateway/). A `Gateway` provides more extensive customization and flexibility than `Ingress`, and allows Istio features such as monitoring and route rules to be applied to traffic entering the cluster
 
-# Observability
+For a step by step tutorial on how to deploy an Istion Ingress Gateway resource, please follow [these instructions](https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/).
 
-Once we have Istio installed...
+> :memo:
+>
+> For another example of deployment of `Istio Ingress Gateway`, please check the Bookinfo deployment instructions at [`deployments/bookinfo/README.md`](../../deployments/bookinfo/README.md#deploy-gateway-bookinfo).
 
-## Prometheus + Grafana
+# cert-manager
+
+https://istio.io/latest/blog/2019/custom-ingress-gateway/
+https://cert-manager.io/docs/usage/istio/
+https://www.programmersought.com/article/51784265469/
+https://stackoverflow.com/questions/56592446/istio-gateway-cert-manager-letsencrypt-certificate
+https://www.youtube.com/watch?v=QlQyqCaTOh0
+
+# Addons
+
+Once we have Istio installed, we can enable the shipped addons (mainly related with Telemetry) with the following command:
+
+```console
+$ kubectl apply -f ~/istio-1.9.0/samples/addons
+```
+
+This deploys the following addons:
+* Prometheus
+* Grafana
+* Jaeger
+* Kiali
+
+For more information about which integrations/addons can be put in place, please check [this](https://istio.io/latest/docs/ops/integrations/).
+
+## Prometheus
+
+https://istio.io/latest/docs/ops/integrations/prometheus/
 
 * https://istio.io/latest/docs/ops/integrations/prometheus/
 * https://www.istiobyexample.dev/prometheus
 * https://istio.io/latest/docs/tasks/observability/metrics/using-istio-dashboard/
 
+## Grafana
+
+https://istio.io/latest/docs/ops/integrations/grafana/
+
+
+Istio Dashboards                           |         Istio Performance Dashboard
+:-----------------------------------------:|:-------------------------:
+![](assets/images/grafana-dashboards.png)  |  ![](assets/images/grafana-istio-performance-dashboard.png)
+
+
+Istio Control Plane Dashboard             |         Istio Workload Dashboard
+:----------------------------------------:|:-------------------------:
+![](assets/images/grafana-istio-control-plane-dashboard.png)  |  ![](assets/images/grafana-istio-workload-dashboard.png)
+
 ## Kiali
 
+> :eyes:
+>
+> There's a way to integrate Distributed Tracing capabilities in Kiali. For configuration details, please read [this](https://kiali.io/documentation/latest/distributed-tracing/).
+
+> :eyes:
+>
+> Another cool feature of Kiali is the `Graph Traces`. For this feature, we need to integrate Distributed Tracing into Kiali. This allows os to correlate the tracing information with the Kiali's graph view. For more information, whatch [this](https://www.youtube.com/watch?v=z7cZDPV9Ge0).
+
+
+https://kiali.io/documentation/v1.24/faq/
+
+
 * https://istio.io/latest/docs/tasks/observability/kiali/
+
+kubectl port-forward svc/kiali -n istio-system 20001
+
+Kiali Home                                 |         Kiali Graph
+:-----------------------------------------:|:-------------------------:
+![](assets/images/kiali-home.png)  |  ![](assets/images/kiali-graph.png)
+
+
+## Jaeger
+
+Jaeger UI Home      |      Jaeger Trace/Span Waterfal Graph
+:------------------:|:-------------------------:
+![](assets/images/jaeger-home.png)  |  ![](assets/images/jaeger-waterfall.png)
+
+
+
+https://kiali.io/documentation/v1.12/distributed-tracing/
+
+
+to integrate with zipkinf, check this https://istio.io/latest/docs/ops/integrations/zipkin/
 
 # Istio-enabled application: Requirements
 
@@ -166,7 +240,6 @@ https://github.com/GoogleCloudPlatform/microservices-demo/blob/master/docs/servi
 * (Authorization in Istio) https://www.istiobyexample.dev/authorization
 * (Istio Ingress/Gateway) https://www.istiobyexample.dev/ingress
 
-
 # Observability of Istio components
 
 ## Logging
@@ -185,7 +258,19 @@ Of Istio's internal components
 
 Of Istio's internal components
 
+kubectl port-forward -n istio-system svc/tracing 12345:80
+
+https://kiali.io/documentation/latest/distributed-tracing/
+
+
+
+
 # Managed Istio solutions
 
 * (Banzai Clound: Backyards) https://banzaicloud.com/products/backyards/, https://banzaicloud.com/products/backyards/pricing/
 * (IBM Cloud) https://www.ibm.com/cloud/blog/announcements/managed-istio-on-ibm-cloud-kubernetes-service-now-ga
+
+
+# Other Resources:
+* https://github.com/ZackButcher/istio-workshop
+* https://github.com/ZackButcher/hybrid-demo

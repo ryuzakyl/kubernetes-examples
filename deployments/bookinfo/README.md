@@ -82,6 +82,8 @@ If the `EXTERNAL-IP` value is set, your environment has an external load balance
 
 ## Deploy Gateway for Bookinfo
 
+<a id="deploy-gateway-bookinfo"></a>
+
 First, we define the ingress gateway for the application (manifest located on folder `HOME/istio-1.9.0`):
 
 ```console
@@ -144,3 +146,4 @@ https://istio.io/latest/docs/tasks/traffic-management/request-routing/
 
 # Other References
 * https://istio.io/latest/docs/examples/bookinfo/
+* https://www.youtube.com/watch?v=16fgzklcF7Y&t=798s
