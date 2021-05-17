@@ -17,3 +17,6 @@ TODO
 
 # exclude .ignore extensions
 *.ignore
+
+# exclude video files
+*.mkv
