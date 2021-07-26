@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: secure-east-west
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: shellshockable
+      app.kubernetes.io/instance: vuln-bash
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              tier: load-balance
+      ports:
+        - port: 80
+          protocol: TCP

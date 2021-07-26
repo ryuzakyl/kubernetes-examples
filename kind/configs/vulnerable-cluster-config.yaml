@@ -1,0 +1,89 @@
+# Setting Kubernetes version:
+#   On KinD, the Kubernetes cluster version depends on the Docker image used. These images can
+#   be seen at the release page for kind CLI tool
+#
+#   References:
+#   * https://github.com/kubernetes-sigs/kind/releases
+
+#    etcd:
+#      extraArgs:
+#        name: "pepe"
+#        election-timeout: "513"
+
+# kube-apiserver
+# * for flag 'enable-admission-plugins' add other plugins to the list such as:
+#     - ImagePolicyWebhook
+#     - MutatingAdmissionWebhook
+#     - ValidatingAdmissionWebhook
+#     - SecurityContextDeny
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+  EphemeralContainers: true
+nodes:
+- role: control-plane
+  image: kindest/node:v1.18.19
+  # image: kindest/node:v1.19.11
+  # image: kindest/node:v1.17.17@sha256:db65f1ba78d5d8e98c1666d6a6531bca6f8e524afff0bfe553eaef60bdafa0b2
+  # image: kindest/node:v1.18.0@sha256:0e20578828edd939d25eb98496a685c76c98d54084932f76069f886ec315d694
+  # image: kindest/node:v1.16.15@sha256:45bbe31b9c5d2f90f15bb8a7604bb088e75e7dd142c191ce7faa7b776f83df61
+  # image: kindest/node:v1.18.2@sha256:1ab458c61fbd408081c9d321ceec1a50adffc2d060e1013d823af3c61fe90ff2
+  # image: kindest/node:v1.16.9@sha256:7175872357bc85847ec4b1aba46ed1d12fa054c83ac7a8a11f5c268957fd5765
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        allow-privileged: "true"
+        anonymous-auth: "true"
+        profiling: "true"
+    ---
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+        anonymous-auth: "true"
+        authorization-mode: "AlwaysAllow"
+        protect-kernel-defaults: "false"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+- role: worker
+  image: kindest/node:v1.18.19
+  # image: kindest/node:v1.19.11
+  # image: kindest/node:v1.17.17@sha256:db65f1ba78d5d8e98c1666d6a6531bca6f8e524afff0bfe553eaef60bdafa0b2
+  # image: kindest/node:v1.18.0@sha256:0e20578828edd939d25eb98496a685c76c98d54084932f76069f886ec315d694
+  # image: kindest/node:v1.16.15@sha256:45bbe31b9c5d2f90f15bb8a7604bb088e75e7dd142c191ce7faa7b776f83df61
+  # image: kindest/node:v1.18.2@sha256:1ab458c61fbd408081c9d321ceec1a50adffc2d060e1013d823af3c61fe90ff2
+  # image: kindest/node:v1.16.9@sha256:7175872357bc85847ec4b1aba46ed1d12fa054c83ac7a8a11f5c268957fd5765
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-label=worker"
+        anonymous-auth: "true"
+        authorization-mode: "AlwaysAllow"
+        protect-kernel-defaults: "false"
+- role: worker
+  image: kindest/node:v1.18.19
+  # image: kindest/node:v1.19.11
+  # image: kindest/node:v1.17.17@sha256:db65f1ba78d5d8e98c1666d6a6531bca6f8e524afff0bfe553eaef60bdafa0b2
+  # image: kindest/node:v1.18.0@sha256:0e20578828edd939d25eb98496a685c76c98d54084932f76069f886ec315d694
+  # image: kindest/node:v1.16.15@sha256:45bbe31b9c5d2f90f15bb8a7604bb088e75e7dd142c191ce7faa7b776f83df61
+  # image: kindest/node:v1.18.2@sha256:1ab458c61fbd408081c9d321ceec1a50adffc2d060e1013d823af3c61fe90ff2
+  # image: kindest/node:v1.16.9@sha256:7175872357bc85847ec4b1aba46ed1d12fa054c83ac7a8a11f5c268957fd5765
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-label=worker2"
+        anonymous-auth: "true"
+        authorization-mode: "AlwaysAllow"
+        protect-kernel-defaults: "false"

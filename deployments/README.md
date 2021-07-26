@@ -30,3 +30,17 @@ Instructions:
 According to the [`repo's`](https://github.com/GoogleCloudPlatform/microservices-demo):
 
 > Google uses this application to demonstrate use of technologies like Kubernetes/GKE, Istio, Stackdriver, gRPC and OpenCensus. This application works on any Kubernetes cluster, as well as Google Kubernetes Engine. It’s easy to deploy with little to no configuration.
+
+# Bad Pods
+
+* https://labs.bishopfox.com/tech-blog/bad-pods-kubernetes-pod-privilege-escalation
+* https://github.com/BishopFox/badPods
+
+
+# GKE Deployment Examples
+
+> :eyes:
+>
+> These deployments are not meant for production use. For more information, read [this](https://stackoverflow.com/questions/49435401/are-dockerfiles-available-for-googles-sample-images-on-google-container-registr).
+
+* https://github.com/GoogleCloudPlatform/kubernetes-engine-samples/

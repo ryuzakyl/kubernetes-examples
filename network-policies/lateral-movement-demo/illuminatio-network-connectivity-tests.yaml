@@ -1,0 +1,26 @@
+# the 'shellshockable' pod CAN be reached from the Nginx pod
+default:app=nginx-test,tier=load-balance:
+  default:app=shellshockable:
+  - '80'
+
+# the 'frontend' pod CAN reach the 'shellshockable' pod
+default:app=guestbook,tier=frontend:
+  default:app=shellshockable:
+  - '-80'
+
+# the 'redis-slave' pod CAN reach the 'shellshockable' pod
+default:app=redis,role=slave:
+  default:app=shellshockable:
+  - '-80'
+
+# the 'redis-master' pod CAN reach the 'shellshockable' pod
+default:app=redis,role=master:
+  default:app=shellshockable:
+  - '-80'
+
+# ONLY DNS can be accessed from the 'shellshockable' pod
+default:app=shellshockable:
+  # '*:k8s-app=kube-dns':
+  # - '53'
+  default:app=shellshockable:
+  - -*

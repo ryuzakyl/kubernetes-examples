@@ -1,0 +1,20 @@
+# Not working
+# Other references
+# * https://github.com/kubernetes/kubeadm/issues/1303
+# * https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/setup-ha-etcd-with-kubeadm/
+# * https://github.com/kubernetes/kubernetes/issues/68333
+# * https://help.hcltechsw.com/connections/v6/admin/install/cp_prereq_kubernetes_ha.html
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      etcdExtraArgs:
+        name: pepe
+        election-timeout: 513
+- role: worker
+- role: worker

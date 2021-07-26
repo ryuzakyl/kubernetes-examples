@@ -1,0 +1,102 @@
+---
+# Source: shellshockable/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vuln-bash-shellshockable
+  labels:
+    helm.sh/chart: shellshockable-0.1.0
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: shellshockable/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vuln-bash-shellshockable
+  labels:
+    helm.sh/chart: shellshockable-0.1.0
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+---
+# Source: shellshockable/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vuln-bash-shellshockable
+  labels:
+    helm.sh/chart: shellshockable-0.1.0
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shellshockable
+      app.kubernetes.io/instance: vuln-bash
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shellshockable
+        app.kubernetes.io/instance: vuln-bash
+    spec:
+      serviceAccountName: vuln-bash-shellshockable
+      securityContext:
+        {}
+      containers:
+        - name: shellshockable
+          securityContext:
+            {}
+          image: "lizrice/shellshockable:0.1.0"
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {}
+---
+# Source: shellshockable/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "vuln-bash-shellshockable-test-connection"
+  labels:
+    helm.sh/chart: shellshockable-0.1.0
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['vuln-bash-shellshockable:80']
+  restartPolicy: Never

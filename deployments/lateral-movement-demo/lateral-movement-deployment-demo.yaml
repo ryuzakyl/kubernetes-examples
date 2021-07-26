@@ -1,0 +1,246 @@
+# redis-master-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+    tier: backend
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+    role: master
+    tier: backend
+---
+# redis-master-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: master
+        image: k8s.gcr.io/redis:e2e  # or just image: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379
+---
+# redis-slave-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+    role: slave
+    tier: backend
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: redis
+    role: slave
+    tier: backend
+---
+# redis-slave-deployment.yaml
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: redis-slave
+  labels:
+    app: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: slave
+      tier: backend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: slave
+        tier: backend
+    spec:
+      containers:
+      - name: slave
+        image: gcr.io/google_samples/gb-redisslave:v3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379
+---
+# frontend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: guestbook
+    tier: frontend
+---
+# frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: guestbook
+spec:
+  selector:
+    matchLabels:
+      app: guestbook
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        tier: frontend
+    spec:
+      containers:
+      - name: php-redis
+        # as image tag is 'latest', it will always be pulled on pod creation
+        image: ryuzakyl/guestbook-frontend-with-statusphp-vuln
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+---
+# nginx.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  labels:
+    app: nginx-test
+    tier: load-balance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-test
+      tier: load-balance
+  template:
+    metadata:
+      labels:
+        app: nginx-test
+        tier: load-balance
+    spec:
+      containers:
+      - name: nginx
+        # as image tag is 'latest', it will always be pulled on pod creation
+        image: nginx
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+---
+# Source: shellshockable/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vuln-bash-shellshockable
+  labels:
+    app: shellshockable
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+---
+# Source: shellshockable/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vuln-bash-shellshockable
+  labels:
+    app: shellshockable
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: shellshockable
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+---
+# Source: shellshockable/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vuln-bash-shellshockable
+  labels:
+    app: shellshockable
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.1.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shellshockable
+      app.kubernetes.io/name: shellshockable
+      app.kubernetes.io/instance: vuln-bash
+  template:
+    metadata:
+      labels:
+        app: shellshockable
+        app.kubernetes.io/name: shellshockable
+        app.kubernetes.io/instance: vuln-bash
+    spec:
+      serviceAccountName: vuln-bash-shellshockable
+      securityContext:
+        {}
+      containers:
+        - name: shellshockable
+          securityContext:
+            {}
+          image: "lizrice/shellshockable:0.1.0"
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+          resources:
+            {}

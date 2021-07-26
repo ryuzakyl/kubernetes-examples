@@ -6,9 +6,25 @@ TAG := v0.0.1
 
 ROOTDIR := $(realpath .)
 
-CONFIG_FILE := ingress-enabled-config.yaml
+# ------------- Ingress -------------
+# CONFIG_FILE := ingress-enabled-config.yaml
+# CONFIG_FILE := ingress-enabled-ephemeral-config.yaml
 
-ISTIO_INSTALLER_PATH :=  ~/istio-1.9.0
+# ------------- Networking -------------
+# CONFIG_FILE := calico-enabled-config.yaml
+# CONFIG_FILE := cilium-enabled-config.yaml
+
+# ------------- Security -------------
+# CONFIG_FILE := vulnerable-etcd-config.yaml
+# CONFIG_FILE := vulnerable-kubelet-config.yaml
+
+# CONFIG_FILE := outdated-cluster-config.yaml
+# CONFIG_FILE := vulnerable-cluster-config.yaml
+# CONFIG_FILE := falco-cluster-config.yaml
+CONFIG_FILE := secured-cluster-config.yaml
+
+
+ISTIO_INSTALLER_PATH := ~/tools/istio-1.10.0
 PRODUCT_PAGE_URL := productpage:9080/productpage
 
 
@@ -106,7 +122,7 @@ ifndef name
 else
 	@echo "Creating cluster named $(name)..."
 	@echo Config file used: ./src/kind/configs/$(CONFIG_FILE)
-	@kind create cluster --name $(name) --config $(ROOTDIR)/kind/configs/$(CONFIG_FILE)
+	@kind create cluster --name $(name) --config $(ROOTDIR)/kind/configs/$(CONFIG_FILE) --retain
 	@kubectl config set-context kind-$(name)
 endif
 
@@ -227,19 +243,250 @@ check-bookinfo-app-is-deployed:
 deploy-istio-gateway-for-bookinfo:
 	@kubectl apply -f $(ISTIO_INSTALLER_PATH)/samples/bookinfo/networking/bookinfo-gateway.yaml
 
-# https://github.com/kubernetes/dashboard/blob/master/docs/user/certificate-management.md
-# https://www.ssls.com/knowledgebase/how-to-fill-in-the-san-fields-in-the-csr/
+# ---------------------------------------------------------------------------
 
-# kubectl create secret tls kubernetes-dashboard-tls-secret --namespace="kubernetes-dashboard" --key="dashboard.key" --cert="dashboard.crt"
-# https://shocksolution.com/2018/12/14/creating-kubernetes-secrets-using-tls-ssl-as-an-example/
+setup-attack-scenario-02-pre:
+#	creating cluster
+	@echo "Creating cluster for Scenario 2...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/cilium-enabled-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+
+#	intalling cilium
+	@echo "Installing Cilium...";
+	@kubectl create -f https://raw.githubusercontent.com/cilium/cilium/v1.9/install/kubernetes/quick-install.yaml
+	@echo "";
+
+# 	installing cilium hubble
+	@echo "Installing Cilium Hubble..."
+	@kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/v1.9/install/kubernetes/quick-hubble-install.yaml
+
+# 	add deployment with vulnerable applications
+	@kubectl apply -f deployments/lateral-movement-demo/lateral-movement-deployment-demo.yaml
 
 
-# openssl req -new -out dashboard.csr -newkey rsa:2048 -nodes -sha256 -keyout dashboard.key -config dashboard-req.conf
-# openssl x509 -req -sha256 -days 365 -in dashboard.csr -signkey dashboard.key -out dashboard.crt
+setup-attack-scenario-02-post:
+#	creating cluster
+	@echo "Creating cluster for Scenario 2...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/cilium-enabled-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
 
+#	intalling cilium
+	@echo "Installing Cilium...";
+	@kubectl create -f https://raw.githubusercontent.com/cilium/cilium/v1.9/install/kubernetes/quick-install.yaml
+	@echo "";
 
+# 	installing cilium hubble
+	@echo "Installing Cilium Hubble..."
+	@kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/v1.9/install/kubernetes/quick-hubble-install.yaml
 
-# create secret imperative
-# kubectl create secret tls test-tls --key="tls.key" --cert="tls.crt"
-# https://shocksolution.com/2018/12/14/creating-kubernetes-secrets-using-tls-ssl-as-an-example/
-# kubectl create secret tls kubernetes-dashboard-tls-secret --namespace="kubernetes-dashboard" --key="dashboard.key" --cert="dashboard.crt"
+# 	add deployment with vulnerable applications
+	@kubectl apply -f deployments/lateral-movement-demo/lateral-movement-deployment-demo-secured.yaml
+
+# ---------------------------------------------------------------------------
+
+setup-attack-scenario-03-falco-pre:
+#	creating cluster
+	@echo "Creating cluster for Scenario 3 with Falco...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/falco-cluster-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+
+setup-attack-scenario-03-falco-post:
+#	creating cluster
+	@echo "Creating cluster for Scenario 3 with Falco...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/falco-cluster-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+
+#	intalling Falco with rules for CV-2020-8554
+	@helm repo add falcosecurity https://falcosecurity.github.io/charts
+	@helm repo update
+	@falco/rules2helm falco/cve-2020-8554/cve-2020-8554-rules.yaml > falco/cve-2020-8554/cve-2020-8554-helm-rules.yaml
+	@helm install falco \
+		-f falco/cve-2020-8554/cve-2020-8554-helm-rules.yaml \
+		falcosecurity/falco
+	@echo "";
+	@echo "Done..."
+
+# --set auditLog.enabled=true \
+# --set falco.jsonOutput=true \
+# --set falco.httpOutput.enabled=true \
+
+# -------------
+
+setup-attack-scenario-03-opa-gatekeeper-pre:
+#	creating cluster
+	@echo "Creating cluster for Scenario 3 with Gatekeeper...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/secured-cluster-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+	@echo "Done..."
+
+setup-attack-scenario-03-opa-gatekeeper-post:
+#	creating cluster
+	@echo "Creating cluster for Scenario 3 with Gatekeeper...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/secured-cluster-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+
+#	intalling OPA Gatekeeper and constraints
+#	@kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/release-3.5/deploy/gatekeeper.yaml
+	@kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/master/deploy/gatekeeper.yaml
+	@echo "Sleeping before continuing creating resources...";
+	@sleep 3;
+	@kubectl apply -f opa/external-ip/template.yaml
+	@sleep 3;
+	@kubectl apply -f opa/external-ip/samples/allowed-ip/constraint.yaml
+	@echo "";
+	@echo "Done..."
+
+# ---------------
+
+setup-attack-scenario-03-admission-controllers-pre:
+#	creating cluster
+	@echo "Creating cluster for Scenario 3 with Admission Controllers...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/admission-controllers-cluster-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+	@echo "Done..."
+
+setup-attack-scenario-03-admission-controllers-post:
+#	creating cluster
+	@echo "Creating cluster for Scenario 3 with Admission Controllers...";
+	@kind create cluster --name tfm-k8s --config $(ROOTDIR)/kind/configs/admission-controllers-cluster-config.yaml --retain
+	@kubectl config set-context kind-tfm-k8s
+	@echo "";
+	@echo "Cluster created."
+
+#	deploying Admission Controllers for invalid external IPs
+	@echo "";
+	@echo "Deploying Admission Controllers for this scenario"
+	@kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.1.1/cert-manager.yaml
+	@kubectl create ns cattle-externalip-system
+	@sleep 5;
+# 	https://github.com/rancher/externalip-webhook/blob/master/chart/README.md
+	@helm install rancher-external-ip-webhook \
+		rancher-chart/rancher-external-ip-webhook \
+		--namespace cattle-externalip-system \
+		--set allowedExternalIPCidrs="203.0.113.0/32"
+	@echo "Sleeping before checking if the webhook is ready";
+	@sleep 5;
+	@kubectl --namespace=cattle-externalip-system get pods -l "app=rancher-external-ip-webhook,release=rancher-external-ip-webhook"
+	@echo "Done";
+
+# ---------------------------------------------------------------------------
+
+sync-material-adjunto:
+# 	copy latest version of file used for cluster vulnerable configuration
+	@echo "Saving vulnerable KinD cluster configuration...";
+	@cp kind/configs/vulnerable-cluster-config.yaml ../material-adjunto/kind/configs/
+
+# 	copy latest version of Kubernetes Attack Matrix spreadsheets
+	@echo "Saving latest version of support spreadsheets...";
+	@gdrive export -f --mime application/vnd.openxmlformats-officedocument.spreadsheetml.sheet 137oKwyKXy67m58CIieDuvnG2EieTbETF8IbV3wd-HNg
+	@gdrive export -f --mime application/vnd.openxmlformats-officedocument.spreadsheetml.sheet 1IOWILRuTKyZK77c7FeNTJPdlpDk_8Dn9OdFfm76tkhA
+	@mv *.xlsx ../material-adjunto/kubernetes-attack-matrix/
+	@echo "";
+
+# 	copy latest version of thesis defense presentation
+	@echo "Saving latest version of thesis presentation slides...";
+	@gdrive export -f --mime application/pdf 1aOJZrzaAGcvGCUrw12tCLc0MOXI0AWx-KvMJjBrtejA
+	@gdrive export -f --mime application/vnd.oasis.opendocument.presentation 1aOJZrzaAGcvGCUrw12tCLc0MOXI0AWx-KvMJjBrtejA
+	@gdrive export -f --mime application/vnd.openxmlformats-officedocument.presentationml.presentation 1aOJZrzaAGcvGCUrw12tCLc0MOXI0AWx-KvMJjBrtejA
+	@mv *.odp ../material-adjunto/transparencias-defensa/
+	@mv *.pptx ../material-adjunto/transparencias-defensa/
+	@mv *.pdf ../material-adjunto/transparencias-defensa/
+	@echo "";
+
+#	copy latest version of files for blue team and read team audits
+	@echo "Saving latest version of config files for Blue and Red team audits";
+	@cp ../tools/aquasecurity/kube-bench/job-master.yaml ../material-adjunto/audit/blue-team/
+	@cp ../tools/aquasecurity/kube-bench/job-node.yaml ../material-adjunto/audit/blue-team/
+	@cp ../tools/aquasecurity/kube-hunter/job.yaml ../material-adjunto/audit/red-team/
+	@echo "";
+
+#	------------------------ scenario 2 related data ------------------------
+
+#	copy files for scenario 2
+	@echo "Copying KinD config file and deployment manifests...";
+	@cp kind/configs/cilium-enabled-config.yaml ../material-adjunto/attack-scenarios/02-lateral-movement/kind/
+	@cp deployments/lateral-movement-demo/* ../material-adjunto/attack-scenarios/02-lateral-movement/deployment/
+	@echo "";
+
+#	Checkov audit log files
+	@echo "Running Checkov analysis live...";
+	@checkov -s -f deployments/lateral-movement-demo/lateral-movement-deployment-demo.yaml > ../material-adjunto/attack-scenarios/02-lateral-movement/checkov/checkov-audit-pre-mitigation.log
+	@checkov -s -f deployments/lateral-movement-demo/lateral-movement-deployment-demo-secured.yaml > ../material-adjunto/attack-scenarios/02-lateral-movement/checkov/checkov-audit-post-mitigation.log
+	@echo "";
+
+#	Trivy audit log files
+	@echo "Running Trivy analysis live...";
+	@trivy ryuzakyl/guestbook-frontend-with-statusphp-vuln:1.0.0 > ../material-adjunto/attack-scenarios/02-lateral-movement/trivy/guestbook-frontend-with-statusphp-vuln-pre.log
+	@trivy ryuzakyl/guestbook-frontend-with-statusphp-vuln:2.0.0 > ../material-adjunto/attack-scenarios/02-lateral-movement/trivy/guestbook-frontend-with-statusphp-vuln-post.log
+	@trivy lizrice/shellshockable:0.1.0 > ../material-adjunto/attack-scenarios/02-lateral-movement/trivy/shellshockable-pre.log
+	@trivy lizrice/shellshockable:0.3.0 > ../material-adjunto/attack-scenarios/02-lateral-movement/trivy/shellshockable-post.log
+	@echo "";
+
+#	polaris folder setup
+	@echo "Saving Polaris related data...";
+	@echo "Polaris related data is taken directly from the Dashboard service." > ../material-adjunto/attack-scenarios/02-lateral-movement/polaris/README.md
+	@echo "";
+
+#	copying network policy files
+	@echo "Copying Cilium and Generic Network Policies...";
+	@cp -r network-policies/lateral-movement-demo/* ../material-adjunto/attack-scenarios/02-lateral-movement/network-policies/
+	@echo "";
+
+#	------------------------ scenario 3 related data ------------------------
+
+#	creating folders
+	@mkdir -p ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554
+	@mkdir -p ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/kind
+	@mkdir -p ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/services
+	@mkdir -p ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/admission-controllers
+	@mkdir -p ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/opa-gatekeeper
+	@mkdir -p ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/falco
+
+#	copy kind configurations
+	@cp kind/configs/admission-controllers-cluster-config.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/kind/
+	@cp kind/configs/secured-cluster-config.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/kind/
+	@cp kind/configs/falco-cluster-config.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/kind/
+
+#	copy test services manifests
+	@cp admission-controllers/externalip-webhook/example_allowed.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/services/
+	@cp admission-controllers/externalip-webhook/example_disallowed.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/services/
+	@echo "";
+
+#	copy admission controllers related files
+	echo "No files related to this approach" ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/admission-controllers/README.md
+
+#	copy opa gatekeeper related files
+	cp opa/external-ip/template.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/opa-gatekeeper/
+	cp opa/external-ip/samples/allowed-ip/constraint.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/opa-gatekeeper/
+
+#	copy falco related files
+	@cp falco/rules2helm ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/falco/
+	@cp falco/cve-2020-8554/cve-2020-8554-rules.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/falco/
+	@cp falco/cve-2020-8554/cve-2020-8554-helm-rules.yaml ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/falco/
+	@cp -r falco/cve-2020-8554/audit ../material-adjunto/attack-scenarios/03-man-in-the-middle-via-cve-2020-8554/falco/
+
+#	------------------------ start of syncing process ------------------------
+
+#	syncronize local 'material-adjunto' folder with Drive version
+	@echo "Performing syncing with remote Drive folder...";
+	@gdrive sync upload --keep-local --delete-extraneous ../material-adjunto 13loIUB0MFXO38_bwO38c_POiPfWMIoWX
+	@echo "";
+
+#	------------------------ end of syncing process ------------------------
+
+#	end of sync process
+	@echo "Done.";

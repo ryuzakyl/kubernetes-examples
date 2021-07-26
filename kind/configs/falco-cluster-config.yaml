@@ -1,0 +1,31 @@
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+featureGates:
+  AdvancedAuditing: false
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        audit-log-path: "/tmp/audit/audit.log"
+        audit-policy-file: "/tmp/audit/audit_policy.yaml"
+      extraVolumes:
+      - name: audit
+        hostPath: /tmp/audit
+        mountPath: /tmp/audit
+  extraMounts:
+  - hostPath: /dev
+    containerPath: /dev
+  - hostPath: falco/cve-2020-8554/audit
+    containerPath: /tmp/audit
+- role: worker
+  extraMounts:
+  - hostPath: /dev
+    containerPath: /dev
+- role: worker
+  extraMounts:
+  - hostPath: /dev
+    containerPath: /dev

@@ -1,0 +1,379 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: secured-ns
+---
+# redis-master-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  namespace: secured-ns
+  labels:
+    app: redis
+    role: master
+    tier: backend
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+    role: master
+    tier: backend
+---
+# redis-master-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-master
+  namespace: secured-ns
+  labels:
+    app: redis
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: "runtime/default"
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        tier: backend
+    spec:
+      securityContext:
+        {}
+      automountServiceAccountToken: false
+      containers:
+      - name: master
+        image: k8s.gcr.io/redis:e2e
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - NET_RAW
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "redis-cli ping"
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "redis-cli ping"
+        ports:
+        - containerPort: 6379
+---
+# redis-slave-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-slave
+  namespace: secured-ns
+  labels:
+    app: redis
+    role: slave
+    tier: backend
+spec:
+  ports:
+  - port: 6379
+  selector:
+    app: redis
+    role: slave
+    tier: backend
+---
+# redis-slave-deployment.yaml
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: redis-slave
+  namespace: secured-ns
+  labels:
+    app: redis
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: "runtime/default"
+spec:
+  selector:
+    matchLabels:
+      app: redis
+      role: slave
+      tier: backend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: slave
+        tier: backend
+    spec:
+      securityContext:
+        {}
+      automountServiceAccountToken: false
+      containers:
+      - name: slave
+        image: gcr.io/google_samples/gb-redisslave:v3@sha256:57730a481f97b3321138161ba2c8c9ca3b32df32ce9180e4029e6940446800ec
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - NET_RAW
+            # - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "redis-cli ping"
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "redis-cli ping"
+        ports:
+        - containerPort: 6379
+---
+# frontend-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: secured-ns
+  labels:
+    app: guestbook
+    tier: frontend
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: guestbook
+    tier: frontend
+---
+# frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: secured-ns
+  labels:
+    app: guestbook
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: "runtime/default"
+spec:
+  selector:
+    matchLabels:
+      app: guestbook
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        tier: frontend
+    spec:
+      securityContext:
+        {}
+      automountServiceAccountToken: false
+      containers:
+      - name: php-redis
+        # as image tag is 'latest', it will always be pulled on pod creation
+        image: ryuzakyl/guestbook-frontend-with-statusphp-vuln:1.0@sha256:9315f467d2c52284741d6539edfa34c27b4b001a2f586f082aa8fab1ec8483dc
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          # readOnlyRootFilesystem: true
+          # runAsUser: 1000
+          capabilities:
+            drop:
+            - NET_RAW
+            # - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        ports:
+        - containerPort: 80
+---
+# nginx.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: secured-ns
+  labels:
+    app: guestbook
+    tier: load-balance
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: "runtime/default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: guestbook
+      tier: load-balance
+  template:
+    metadata:
+      labels:
+        app: guestbook
+        tier: load-balance
+    spec:
+      securityContext:
+        {}
+      automountServiceAccountToken: false
+      containers:
+      - name: nginx
+        securityContext:
+          allowPrivilegeEscalation: false
+          # readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - NET_RAW
+            # - ALL
+        # as image tag is 'latest', it will always be pulled on pod creation
+        image: nginx:1.19@sha256:eba373a0620f68ffdc3f217041ad25ef084475b8feb35b992574cd83698e9e3c
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 80
+---
+# Source: shellshockable/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vuln-bash-shellshockable
+  namespace: secured-ns
+  labels:
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.3.0"
+---
+# Source: shellshockable/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: vuln-bash-shellshockable
+  namespace: secured-ns
+  labels:
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.3.0"
+spec:
+  # type: NodePort
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+---
+# Source: shellshockable/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vuln-bash-shellshockable
+  namespace: secured-ns
+  labels:
+    app.kubernetes.io/name: shellshockable
+    app.kubernetes.io/instance: vuln-bash
+    app.kubernetes.io/version: "0.3.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: shellshockable
+      app.kubernetes.io/instance: vuln-bash
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: shellshockable
+        app.kubernetes.io/instance: vuln-bash
+    spec:
+      securityContext:
+        {}
+      serviceAccountName: vuln-bash-shellshockable
+      automountServiceAccountToken: false
+      containers:
+        - name: shellshockable
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            # readOnlyRootFilesystem: true
+            # runAsUser: 1000
+            capabilities:
+              drop:
+              - NET_RAW
+              - ALL
+          image: lizrice/shellshockable:0.3.0@sha256:ed9501918e1293b079297fb343278fd90ec113eeb54b4d5545c012605014f89a
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8100
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8100
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8100
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              cpu: 100m
+              memory: 500Mi
