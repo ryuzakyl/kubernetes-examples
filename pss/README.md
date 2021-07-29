@@ -1,0 +1,1 @@
+The manifestos were taken from https://kubernetes.io/docs/concepts/security/pod-security-standards/
