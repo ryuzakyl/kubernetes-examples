@@ -10,8 +10,7 @@ nodes:
     apiServer:
       extraArgs:
         allow-privileged: "true"
-        anonymous-auth: "true"
-        profiling: "true"
+        enable-admission-plugins: NodeRestriction,PodSecurityPolicy
   - |
     kind: InitConfiguration
     nodeRegistration:
